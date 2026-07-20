@@ -21,6 +21,7 @@ nav .brand{font-weight:700;font-size:18px;color:var(--text);}
 nav .brand span{color:var(--accent);}
 nav .links a{color:var(--text-dim);font-size:14px;margin-left:16px;}
 nav .links a:hover{color:var(--accent);}
+@media(max-width:560px){nav{flex-direction:column;gap:8px;padding:12px 16px;}nav .links{text-align:center;}nav .links a{margin:0 9px;}}
 /* hero */
 header.hero{text-align:center;padding:34px 0 24px;}
 .hero .logo{width:72px;height:72px;margin:0 auto 14px;display:block;}
@@ -74,21 +75,6 @@ footer a{color:var(--text-dim);text-decoration:underline;margin:0 7px;}
 
   <main>
     <div class="games">
-      <a class="game-card" href="/cell-dodge/">
-        <div class="thumb" style="background:radial-gradient(circle at 50% 40%,#12202b,#070c11)">
-          <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="100" cy="60" r="16" fill="#3ddc97"/><circle cx="94" cy="55" r="3" fill="#0a0e14"/><circle cx="106" cy="55" r="3" fill="#0a0e14"/>
-            <circle cx="40" cy="30" r="7" fill="#ff5c6c"/><circle cx="160" cy="40" r="9" fill="#ff5c6c"/><circle cx="55" cy="95" r="6" fill="#e8b84b"/><circle cx="150" cy="90" r="7" fill="#ff5c6c"/><circle cx="30" cy="70" r="5" fill="#e8b84b"/><circle cx="175" cy="75" r="5" fill="#e8b84b"/>
-          </svg>
-        </div>
-        <div class="body">
-          <h2>Cell Dodge</h2>
-          <span class="tag">Bullet-hell · Action</span>
-          <p class="desc">Pilot a single cell through storms of projectiles. Dodge, grab power-ups, and face the boss. A pure test of reflexes and positioning.</p>
-          <div class="play">Play ▸</div>
-        </div>
-      </a>
-
       <a class="game-card" href="/cell-culture/">
         <div class="thumb" style="background:radial-gradient(circle at 50% 40%,#141f16,#070c08)">
           <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
@@ -119,6 +105,21 @@ footer a{color:var(--text-dim);text-decoration:underline;margin:0 7px;}
           <div class="play">Play ▸</div>
         </div>
       </a>
+
+      <a class="game-card" href="/cell-dodge/">
+        <div class="thumb" style="background:radial-gradient(circle at 50% 40%,#12202b,#070c11)">
+          <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="60" r="16" fill="#3ddc97"/><circle cx="94" cy="55" r="3" fill="#0a0e14"/><circle cx="106" cy="55" r="3" fill="#0a0e14"/>
+            <circle cx="40" cy="30" r="7" fill="#ff5c6c"/><circle cx="160" cy="40" r="9" fill="#ff5c6c"/><circle cx="55" cy="95" r="6" fill="#e8b84b"/><circle cx="150" cy="90" r="7" fill="#ff5c6c"/><circle cx="30" cy="70" r="5" fill="#e8b84b"/><circle cx="175" cy="75" r="5" fill="#e8b84b"/>
+          </svg>
+        </div>
+        <div class="body">
+          <h2>Cell Dodge</h2>
+          <span class="tag">Bullet-hell · Action</span>
+          <p class="desc">Pilot a single cell through storms of projectiles. Dodge, grab power-ups, and face the boss. A pure test of reflexes and positioning. (Heavier load — best on desktop or Wi-Fi.)</p>
+          <div class="play">Play ▸</div>
+        </div>
+      </a>
     </div>
 
     <div class="ad-region">
@@ -130,14 +131,14 @@ footer a{color:var(--text-dim);text-decoration:underline;margin:0 7px;}
       <h2>About Cell Games</h2>
       <p>Cell Games is a small, independent collection of browser games built around a single theme: the <strong>cell</strong>. Every title is <strong>pure front-end</strong> — nothing to download, no account to create. Open a game in your desktop or mobile browser and play right away. Your progress is saved locally in your own browser.</p>
 
-      <h3>🕹️ Cell Dodge — bullet-hell action</h3>
-      <p class="dim">Steer a lone cell through dense waves of projectiles. Weave between shots, collect drops and upgrades, and survive to the boss. It rewards quick reactions and clean movement.</p>
-
       <h3>🧫 Cell Culture — idle incremental</h3>
       <p class="dim">Manage a petri dish. Cells divide and generate biomass automatically; spend it to buy upgrades and unlock eight strains, from E. coli to a synthetic cell, then prestige for permanent bonuses. It even accrues income while the tab is closed.</p>
 
       <h3>🔍 Cell Mimic — top-down hide-and-seek</h3>
       <p class="dim">A cell that slipped out of the culture flask disguises itself as lab glassware to blend in among identical props and dodge an AI inspector — stay still to stay safe, move and risk suspicion. Play as the hider to outlast the timer, or switch to the seeker mode and root out the disguised cells yourself.</p>
+
+      <h3>🕹️ Cell Dodge — bullet-hell action</h3>
+      <p class="dim">Steer a lone cell through dense waves of projectiles. Weave between shots, collect drops and upgrades, and survive to the boss. It rewards quick reactions and clean movement.</p>
 
       <p style="margin-top:16px" class="dim">All three games share one continuity: the star of Cell Mimic is the very cell that escaped the petri dish in Cell Culture.</p>
     </section>
