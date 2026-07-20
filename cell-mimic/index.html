@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-<title>Cell Mimic · 细胞拟态 —— 实验室躲猫猫游戏</title>
-<meta name="description" content="Cell Mimic 细胞拟态：一只逃出培养皿的细胞，拟态成实验器材躲避 AI 巡检者的俯视躲猫猫游戏。静止即安全、移动即风险。含拟态躲藏与巡检搜寻双模式，支持键鼠与触屏，纯前端单文件。">
+<title>Cell Mimic — Lab Hide-and-Seek Browser Game | Cell Games</title>
+<meta name="description" content="Cell Mimic is a top-down hide-and-seek game: a cell that escaped the dish disguises itself as lab equipment to evade an AI inspector. Stay still to stay safe, move and risk being caught. Two modes — hide or seek. Keyboard and touch, pure front-end single file.">
 <style>
 :root{
   --bg-deep:#0a0e14; --bg-panel:#141b24; --floor:#12202b; --floor-line:#1c2f3d;
@@ -98,25 +98,25 @@ footer{text-align:center;color:var(--text-dim);font-size:12px;margin-top:22px;}
 
   <!-- HUD -->
   <header class="hud">
-    <div class="title">Cell Mimic <small>细胞拟态</small></div>
+    <div class="title">Cell Mimic <small>hide &amp; seek</small></div>
     <div class="stats">
-      <span class="st">模式<b id="ui-mode">—</b></span>
-      <span class="st">关卡<b id="ui-level">1</b></span>
-      <span class="st time" id="ui-time-wrap">时间<b id="ui-time">0</b></span>
-      <span class="st">得分<b id="ui-score">0</b></span>
-      <span class="st">最高<b id="ui-best">0</b></span>
+      <span class="st">Mode<b id="ui-mode">—</b></span>
+      <span class="st">Level<b id="ui-level">1</b></span>
+      <span class="st time" id="ui-time-wrap">Time<b id="ui-time">0</b></span>
+      <span class="st">Score<b id="ui-score">0</b></span>
+      <span class="st">Best<b id="ui-best">0</b></span>
     </div>
     <div class="hbtns">
-      <button class="hbtn" id="btn-pause">暂停</button>
-      <button class="hbtn" id="btn-menu">菜单</button>
+      <button class="hbtn" id="btn-pause">Pause</button>
+      <button class="hbtn" id="btn-menu">Menu</button>
     </div>
   </header>
 
   <!-- 舞台 -->
   <div class="stage-panel">
     <div class="stage-box">
-      <canvas id="game" width="960" height="600" aria-label="细胞拟态游戏舞台"></canvas>
-      <div class="touch-btn" id="touch-disguise">拟态</div>
+      <canvas id="game" width="960" height="600" aria-label="Cell Mimic game stage"></canvas>
+      <div class="touch-btn" id="touch-disguise">Mimic</div>
       <div class="overlay" id="overlay"></div>
     </div>
     <div class="alert-wrap"><div class="alert-bar" id="alert-bar"></div></div>
@@ -125,51 +125,51 @@ footer{text-align:center;color:var(--text-dim);font-size:12px;margin-top:22px;}
 
   <!-- 广告位 -->
   <div class="ad-region">
-    <div class="ad-label">广告</div>
-    <div class="ad-slot" id="ad-bottom"><!-- AdSense 代码后续插入此处 -->广告位</div>
+    <div class="ad-label">Advertisement</div>
+    <div class="ad-slot" id="ad-bottom"><!-- AdSense code goes here -->Ad space</div>
   </div>
 
   <!-- 内容 -->
   <div class="content">
     <section>
-      <h1 style="font-size:20px;color:var(--text)">Cell Mimic · 细胞拟态</h1>
-      <h2>玩法说明</h2>
-      <p>一只从培养皿逃出来的细胞，闯进了堆满器材的实验台。为了不被<strong style="color:var(--hunter)">巡检者</strong>清理掉，它学会了一手绝活——<strong>拟态</strong>成周围的实验器材，混在同类里一动不动。</p>
-      <p>全部乐趣来自一对矛盾：<strong style="color:var(--accent)">静止即安全，移动即风险。</strong>拟态后静止不动，你就是一件普通器材；可一旦在巡检者的<strong>视野扇形</strong>里移动，会动的"器材"立刻引起怀疑，它会走过来验货。被逮到就出局。</p>
-      <p>游戏有两种模式：<strong>拟态躲藏</strong>——你是躲藏者，撑过计时器就过关，逐关越来越难；<strong>巡检搜寻</strong>——换你当找手，从一堆器材里揪出伪装的细胞。</p>
+      <h1 style="font-size:20px;color:var(--text)">Cell Mimic</h1>
+      <h2>How to Play</h2>
+      <p>A cell that escaped its petri dish has wandered onto a lab bench cluttered with equipment. To avoid being cleaned up by the <strong style="color:var(--hunter)">inspector</strong>, it has learned one trick — <strong>mimicry</strong>: turn into a nearby piece of lab equipment and sit perfectly still among identical ones.</p>
+      <p>All the fun comes from one tension: <strong style="color:var(--accent)">stay still to stay safe, move and risk everything.</strong> Disguised and motionless, you are just another prop; but the moment you move inside the inspector's <strong>vision cone</strong>, a "prop" that walks looks suspicious, and it will come over to check. Get caught and you are out.</p>
+      <p>There are two modes: <strong>Mimic &amp; Hide</strong> — you are the hider; outlast the timer to clear the level, and each level gets harder; and <strong>Inspector Hunt</strong> — you become the seeker, rooting out the disguised cells from a crowd of props.</p>
     </section>
     <section>
-      <h2>操作说明</h2>
-      <p>· <strong>桌面（拟态躲藏）</strong>：<kbd>W A S D</kbd> 或 <kbd>方向键</kbd> 移动，<kbd>空格</kbd> 拟态/解除，<kbd>Esc</kbd> 暂停。</p>
-      <p>· <strong>移动端（拟态躲藏）</strong>：在舞台左侧按住拖动出<strong>虚拟摇杆</strong>移动，右下角<strong>拟态按钮</strong>变身。</p>
-      <p>· <strong>巡检搜寻（双端）</strong>：鼠标点击 / 手指点按器材即可"验货"。</p>
-      <p class="dim">提示：靠近器材才能拟态成它；拟态后尽量贴着同类器材群静止，最安全。</p>
+      <h2>Controls</h2>
+      <p>· <strong>Desktop (Mimic &amp; Hide)</strong>: move with <kbd>W A S D</kbd> or the <kbd>arrow keys</kbd>, <kbd>Space</kbd> to mimic/release, <kbd>Esc</kbd> to pause.</p>
+      <p>· <strong>Mobile (Mimic &amp; Hide)</strong>: press and drag on the left side of the stage to bring up a <strong>virtual joystick</strong>; tap the <strong>Mimic button</strong> at the bottom-right to transform.</p>
+      <p>· <strong>Inspector Hunt (both)</strong>: click / tap a prop to "inspect" it.</p>
+      <p class="dim">Tip: you can only mimic a prop when you are close to it; once disguised, staying still among a cluster of the same prop is the safest.</p>
     </section>
     <section>
-      <h2>器材图鉴</h2>
+      <h2>Equipment Field Guide</h2>
       <div class="codex" id="codex"></div>
     </section>
     <section>
-      <h2>攻略提示</h2>
+      <h2>Tips &amp; Strategy</h2>
       <ul class="tips">
-        <li>被看到移动后别原地不动——巡检者会走到"可疑点"验货，你要趁它举手预备的 0.6 秒逃出视野再重新拟态。</li>
-        <li>贴着同类器材扎堆的地方拟态，验货很难精确命中你。</li>
-        <li>酒精灯的火苗一直在晃，是天然掩护：巡检者只对"整体位移"起疑，不会因内置动画怀疑你。</li>
-        <li>巡检搜寻模式里，偷偷抖动/挪位的那件器材，多半就是伪装的细胞。</li>
+        <li>After being seen moving, don't freeze on the spot — the inspector walks to the "suspicious point" to check. Use the 0.6-second wind-up while it raises its hand to slip out of view and re-mimic elsewhere.</li>
+        <li>Mimic where lots of the same prop are clustered; it is hard for a check to land precisely on you.</li>
+        <li>The alcohol lamp's flame always flickers — natural cover. The inspector only reacts to overall movement, never to a prop's built-in animation.</li>
+        <li>In Inspector Hunt, the prop that quietly twitches or shifts is almost always a disguised cell.</li>
       </ul>
     </section>
     <section>
-      <h2>世界观</h2>
-      <p class="dim">Cell Mimic 与 <strong>Cell Dodge</strong>（弹幕闪避）、<strong>Cell Culture</strong>（细胞培养）同属一个细胞宇宙——这只主角，正是从 Cell Culture 的培养皿里溜出来的那一株。</p>
+      <h2>Universe</h2>
+      <p class="dim">Cell Mimic shares a cell universe with <strong>Cell Dodge</strong> (bullet-hell) and <strong>Cell Culture</strong> (idle) — and its hero is the very cell that slipped out of the petri dish in Cell Culture.</p>
     </section>
     <section>
-      <h2>更新日志</h2>
+      <h2>Changelog</h2>
       <ul class="changelog">
-        <li><b>v1.0.0</b> · 2026-07-20 · 首发：拟态躲藏、巡检搜寻双模式，三态巡检 AI 与视野系统，逐关难度、本地最高分与关卡进度。</li>
+        <li><b>v1.0.0</b> · 2026-07-20 · Initial release: Mimic &amp; Hide and Inspector Hunt modes, a three-state inspector AI with a vision system, per-level difficulty, local high scores and level progress.</li>
       </ul>
     </section>
   </div>
-  <footer>Cell Mimic · 纯前端单文件躲猫猫 · 无外部依赖 · 数据仅存于你的浏览器</footer>
+  <footer>Cell Mimic · A pure front-end single-file hide-and-seek game · No external dependencies · Data stays only in your browser · <a href="/" style="color:var(--text-dim)">Cell Games</a></footer>
 </div>
 
 <script>
@@ -198,12 +198,12 @@ const CONFIG = {
 
   // 器材：名称/英文/颜色/科普
   props:[
-    { name:"培养皿",  en:"Petri Dish",   col:"#7fb0c9", bio:"浅圆盘，用于培养微生物菌落，是实验室最常见的容器。" },
-    { name:"试管",    en:"Test Tube",    col:"#6fd0c4", bio:"细长玻璃管，用于盛放、混合与加热少量液体样本。" },
-    { name:"烧杯",    en:"Beaker",       col:"#9ab0e0", bio:"带刻度的广口杯，用于配制溶液与粗略量取液体。" },
-    { name:"离心管",  en:"Centrifuge",   col:"#c9a0e0", bio:"尖底小管，配合离心机按密度分离样本中的组分。" },
-    { name:"酒精灯",  en:"Alcohol Lamp", col:"#e0b57f", bio:"以酒精为燃料的小灯，用于加热与灼烧灭菌。" },
-    { name:"菌落瓶",  en:"Culture Flask",col:"#86d69a", bio:"圆肚窄颈的培养瓶，用于液体培养基中扩增细胞。" },
+    { name:"Petri Dish",      en:"dish",      col:"#7fb0c9", bio:"A shallow round dish used to culture microbial colonies — the most common vessel in a lab." },
+    { name:"Test Tube",       en:"glass",     col:"#6fd0c4", bio:"A slim glass tube for holding, mixing, and heating small liquid samples." },
+    { name:"Beaker",          en:"glassware", col:"#9ab0e0", bio:"A wide graduated cup for preparing solutions and rough liquid measurement." },
+    { name:"Centrifuge Tube", en:"tube",      col:"#c9a0e0", bio:"A cone-bottomed tube that, in a centrifuge, separates a sample's components by density." },
+    { name:"Alcohol Lamp",    en:"burner",    col:"#e0b57f", bio:"A small alcohol-fueled lamp used for heating and flame sterilization." },
+    { name:"Culture Flask",   en:"flask",     col:"#86d69a", bio:"A round-bellied, narrow-necked flask for growing cells in liquid medium." },
   ],
 };
 
@@ -216,8 +216,8 @@ function loadSave(){
     if(!raw) return;
     const d = JSON.parse(decodeURIComponent(escape(atob(raw))));
     if(d && d.v === CONFIG.saveVersion) SAVE = Object.assign(freshSave(), d);
-    else console.warn("[CellMimic] 存档版本不符，回退默认。");
-  }catch(e){ console.warn("[CellMimic] 读档失败，回退默认。", e); }
+    else console.warn("[CellMimic] Save version mismatch; using defaults.");
+  }catch(e){ console.warn("[CellMimic] Failed to load save; using defaults.", e); }
 }
 function writeSave(){
   try{ localStorage.setItem(CONFIG.saveKey, btoa(unescape(encodeURIComponent(JSON.stringify(SAVE))))); }catch(e){}
@@ -361,7 +361,7 @@ function startGame(mode, level){
   screen="playing";
   hideOverlay();
   updateHUD();
-  showHint(mode==="A" ? "靠近器材按 空格/拟态按钮 变身，静止别被看见移动" : "点击你觉得可疑（会动）的器材来验货", 3.5);
+  showHint(mode==="A" ? "Get close to a prop and press Space / the Mimic button to disguise. Stay still — don't be seen moving." : "Click any prop that looks suspicious (moving) to inspect it", 3.5);
 }
 
 function pickWaypoint(h, walls){
@@ -457,13 +457,13 @@ function updateModeA(dt){
   // 拟态切换
   if(disguiseQueued){
     disguiseQueued=false;
-    if(P.disguised){ P.disguised=false; P.morph=0; sfx.undisguise(); showHint("解除拟态",1); }
+    if(P.disguised){ P.disguised=false; P.morph=0; sfx.undisguise(); showHint("Disguise released",1); }
     else{
       // 找最近器材
       let best=null,bd=1e9; for(const p of game.props){ const d=dist(p.x,p.y,P.x,P.y); if(d<bd){bd=d;best=p;} }
       if(best && bd<=C.disguiseRange){ P.disguised=true; P.disguiseType=best.type; P.morph=0; sfx.disguise();
-        spawnParticles(P.x,P.y,CONFIG.props[best.type].col,10); showHint("已拟态成"+CONFIG.props[best.type].name+"，静止最安全",1.6); }
-      else showHint("靠近器材才能拟态",1.2);
+        spawnParticles(P.x,P.y,CONFIG.props[best.type].col,10); showHint("Now mimicking "+CONFIG.props[best.type].name+" — stay still to be safe",1.6); }
+      else showHint("Get closer to a prop to mimic it",1.2);
     }
   }
   if(P.morph<1) P.morph=Math.min(1,P.morph+dt/C.disguiseTime);
@@ -513,7 +513,7 @@ function updateHunter(h,dt){
       if(h.windup>=HC.inspectWindup){ // 验货判定
         h.windup=0;
         if(dist(h.x,h.y,P.x,P.y)<HC.catchRadius){ h.caughtPlayer=true; }
-        else { h.state="patrol"; h.susp*=0.3; game.escapes++; pickWaypoint(h,game.walls); showHint("惊险逃脱！",1.2); }
+        else { h.state="patrol"; h.susp*=0.3; game.escapes++; pickWaypoint(h,game.walls); showHint("Narrow escape!",1.2); }
       }
     } else { moveHunter(h,tgt,h.patrolSpeed*1.3,dt); h.windup=0; }
     if(h.susp>=S.inspectThreshold && inCone && !P.disguised && P.moving){ h.state="chase"; }
@@ -542,9 +542,9 @@ function inspectAt(x,y){
   let best=null,bd=1e9; for(const p of game.props){ if(p.gone) continue; const d=dist(p.x,p.y,x,y); if(d<bd){bd=d;best=p;} }
   if(!best || bd>42){ return; }
   spawnParticles(best.x,best.y,"#ffffff",8);
-  if(best.hider){ best.gone=true; game.found++; game.score+=100; sfx.found(); showHint("抓到一只！("+game.found+"/"+game.hiderTotal+")",1.2);
+  if(best.hider){ best.gone=true; game.found++; game.score+=100; sfx.found(); showHint("Caught one! ("+game.found+"/"+game.hiderTotal+")",1.2);
     if(game.found>=game.hiderTotal) return endRound(true);
-  } else { game.timeLeft-=CONFIG.roundB.wrongPenalty; game.score=Math.max(0,game.score-20); sfx.wrong(); showHint("验错了，-"+CONFIG.roundB.wrongPenalty+"秒",1); }
+  } else { game.timeLeft-=CONFIG.roundB.wrongPenalty; game.score=Math.max(0,game.score-20); sfx.wrong(); showHint("Wrong — -"+CONFIG.roundB.wrongPenalty+"s",1); }
   updateHUD();
 }
 
@@ -733,7 +733,7 @@ function roundRect(g,x,y,w,h,r){ g.beginPath(); roundRectPath(g,x,y,w,h,r); }
    ========================================================================= */
 const $=id=>document.getElementById(id);
 function updateHUD(){
-  $("ui-mode").textContent = game? (game.mode==="A"?"躲藏":"搜寻") : "—";
+  $("ui-mode").textContent = game? (game.mode==="A"?"Hide":"Seek") : "—";
   $("ui-level").textContent = game? game.level : 1;
   $("ui-score").textContent = game? game.score : 0;
   $("ui-best").textContent = game? (game.mode==="A"?SAVE.bestA:SAVE.bestB) : Math.max(SAVE.bestA,SAVE.bestB);
@@ -752,51 +752,51 @@ function showOverlay(html){ overlay.innerHTML=html; overlay.classList.add("show"
 
 function showMenu(){
   screen="menu"; game=null; updateHUD(); tbtn.classList.remove("showbtn");
-  const contA = SAVE.maxLevelA>1? '<div class="cont">继续 第'+SAVE.maxLevelA+'关 ▸</div>':'';
-  const contB = SAVE.maxLevelB>1? '<div class="cont">继续 第'+SAVE.maxLevelB+'关 ▸</div>':'';
+  const contA = SAVE.maxLevelA>1? '<div class="cont">Continue · Level '+SAVE.maxLevelA+' ▸</div>':'';
+  const contB = SAVE.maxLevelB>1? '<div class="cont">Continue · Level '+SAVE.maxLevelB+' ▸</div>':'';
   showOverlay(
-    '<h2 style="color:var(--accent)">Cell Mimic · 细胞拟态</h2>'+
-    '<p>选择模式开始游戏</p>'+
+    '<h2 style="color:var(--accent)">Cell Mimic</h2>'+
+    '<p>Choose a mode to start</p>'+
     '<div class="mode-cards">'+
-      '<div class="mode-card" data-act="startA"><h3>🧫 拟态躲藏</h3><div class="em">变成器材躲避 AI 巡检者，撑过计时器过关</div>'+
-        '<div class="best">最高分 '+SAVE.bestA+'</div>'+contA+'</div>'+
-      '<div class="mode-card" data-act="startB"><h3>🔍 巡检搜寻</h3><div class="em">你当找手，从器材堆里点出伪装的细胞</div>'+
-        '<div class="best">最高分 '+SAVE.bestB+'</div>'+contB+'</div>'+
+      '<div class="mode-card" data-act="startA"><h3>🧫 Mimic &amp; Hide</h3><div class="em">Turn into equipment to evade the AI inspector; outlast the timer to clear the level.</div>'+
+        '<div class="best">Best '+SAVE.bestA+'</div>'+contA+'</div>'+
+      '<div class="mode-card" data-act="startB"><h3>🔍 Inspector Hunt</h3><div class="em">You are the seeker — click out the disguised cells from a crowd of props.</div>'+
+        '<div class="best">Best '+SAVE.bestB+'</div>'+contB+'</div>'+
     '</div>'+
-    '<div class="btnrow"><button class="gbtn sec" data-act="settings">设置</button></div>'+
-    '<div class="small-link" data-act="scrollDoc">查看玩法说明 / 器材图鉴</div>'
+    '<div class="btnrow"><button class="gbtn sec" data-act="settings">Settings</button></div>'+
+    '<div class="small-link" data-act="scrollDoc">Read how to play / equipment guide</div>'
   );
 }
 function showPause(){
-  showOverlay('<h2>已暂停</h2>'+
-    '<div class="btnrow"><button class="gbtn" data-act="resume">继续</button>'+
-    '<button class="gbtn sec" data-act="restart">重开本关</button>'+
-    '<button class="gbtn sec" data-act="menu">主菜单</button></div>');
+  showOverlay('<h2>Paused</h2>'+
+    '<div class="btnrow"><button class="gbtn" data-act="resume">Resume</button>'+
+    '<button class="gbtn sec" data-act="restart">Restart Level</button>'+
+    '<button class="gbtn sec" data-act="menu">Main Menu</button></div>');
 }
 function showSettings(back){
-  showOverlay('<h2>设置</h2>'+
-    '<div class="set-row"><label><input type="checkbox" id="set-sound" '+(SAVE.sound?"checked":"")+'> 音效</label></div>'+
-    '<div class="btnrow"><button class="gbtn sec" data-act="clear">清除记录</button>'+
-    '<button class="gbtn" data-act="'+(back||"menu")+'">返回</button></div>'+
+  showOverlay('<h2>Settings</h2>'+
+    '<div class="set-row"><label><input type="checkbox" id="set-sound" '+(SAVE.sound?"checked":"")+'> Sound</label></div>'+
+    '<div class="btnrow"><button class="gbtn sec" data-act="clear">Clear Records</button>'+
+    '<button class="gbtn" data-act="'+(back||"menu")+'">Back</button></div>'+
     '<p class="dim" id="set-msg" style="margin-top:10px"></p>');
   $("set-sound").addEventListener("change",e=>{ SAVE.sound=e.target.checked; writeSave(); if(SAVE.sound) sfx.disguise(); });
 }
 let clearArmed=false;
 function showOverlayResult(win,score){
   const nextLevel=game.level+1;
-  const modeName=game.mode==="A"?"拟态躲藏":"巡检搜寻";
+  const modeName=game.mode==="A"?"Mimic & Hide":"Inspector Hunt";
   let detail="";
-  if(game.mode==="A") detail= win? '你成功隐藏了整整 '+(CONFIG.roundA.baseTime+CONFIG.roundA.timePerLevel*(game.level-1))+' 秒！' : '被巡检者逮到了…';
-  else detail= win? '找齐全部 '+game.hiderTotal+' 只伪装细胞！' : '时间到，只找到 '+game.found+'/'+game.hiderTotal;
+  if(game.mode==="A") detail= win? 'You stayed hidden for the full '+(CONFIG.roundA.baseTime+CONFIG.roundA.timePerLevel*(game.level-1))+' seconds!' : 'The inspector caught you…';
+  else detail= win? 'Found all '+game.hiderTotal+' disguised cells!' : "Time's up — you found only "+game.found+'/'+game.hiderTotal;
   showOverlay(
-    '<h2 class="'+(win?"win":"lose")+'">'+(win?"过关！":"失败")+'</h2>'+
-    '<p>'+modeName+' · 第 '+game.level+' 关</p>'+
+    '<h2 class="'+(win?"win":"lose")+'">'+(win?"Level Clear!":"Caught")+'</h2>'+
+    '<p>'+modeName+' · Level '+game.level+'</p>'+
     '<p class="big">'+detail+'</p>'+
-    '<p class="big">得分 <b style="color:var(--accent)">'+score+'</b> · 最高 '+(game.mode==="A"?SAVE.bestA:SAVE.bestB)+'</p>'+
+    '<p class="big">Score <b style="color:var(--accent)">'+score+'</b> · Best '+(game.mode==="A"?SAVE.bestA:SAVE.bestB)+'</p>'+
     '<div class="btnrow">'+
-      (win? '<button class="gbtn" data-act="next" data-lv="'+nextLevel+'">下一关 ▸</button>':'<button class="gbtn" data-act="retry">再试一次</button>')+
-      '<button class="gbtn sec" data-act="retry">重开本关</button>'+
-      '<button class="gbtn sec" data-act="menu">主菜单</button>'+
+      (win? '<button class="gbtn" data-act="next" data-lv="'+nextLevel+'">Next Level ▸</button>':'<button class="gbtn" data-act="retry">Try Again</button>')+
+      '<button class="gbtn sec" data-act="retry">Restart Level</button>'+
+      '<button class="gbtn sec" data-act="menu">Main Menu</button>'+
     '</div>'
   );
 }
@@ -813,7 +813,7 @@ overlay.addEventListener("click",e=>{
   else if(act==="resume") resume();
   else if(act==="restart"||act==="retry") startGame(game.mode, game.level);
   else if(act==="next") startGame(game.mode, parseInt(el.dataset.lv,10));
-  else if(act==="clear"){ if(!clearArmed){ clearArmed=true; $("set-msg").textContent="再点一次「清除记录」确认，记录不可恢复。"; el.textContent="确认清除"; }
+  else if(act==="clear"){ if(!clearArmed){ clearArmed=true; $("set-msg").textContent="Click 'Clear Records' again to confirm. This cannot be undone."; el.textContent="Confirm Clear"; }
     else { SAVE=freshSave(); writeSave(); clearArmed=false; showMenu(); } }
   else if(act==="scrollDoc"){ document.querySelector(".content").scrollIntoView({behavior:"smooth"}); }
 });

@@ -1,33 +1,35 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cell Games · 细胞宇宙小游戏站</title>
-<meta name="description" content="Cell Games 细胞宇宙：三款纯前端网页小游戏——细胞闪避 Cell Dodge、细胞培养 Cell Culture、细胞拟态 Cell Mimic。免安装、免登录，打开即玩，支持电脑与手机。">
+<title>Cell Games — Free Browser Games in the Cell Universe</title>
+<meta name="description" content="Cell Games is a small collection of free, no-install browser games set in a shared cell universe: Cell Dodge (bullet-hell), Cell Culture (idle), and Cell Mimic (hide-and-seek). Play instantly on desktop or mobile.">
+<link rel="canonical" href="https://game.rickbing.com/">
 <style>
-:root{
-  --bg-deep:#0a0e14; --bg-panel:#141b24; --border:#1f2b38;
-  --text:#c8d4e0; --text-dim:#6b7d8f; --accent:#3ddc97; --accent-dim:#1a6b4a; --warn:#e8b84b; --hunter:#ff5c6c;
-}
+:root{--bg-deep:#0a0e14;--bg-panel:#141b24;--border:#1f2b38;--text:#c8d4e0;--text-dim:#6b7d8f;--accent:#3ddc97;--accent-dim:#1a6b4a;--warn:#e8b84b;--hunter:#ff5c6c;}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{margin:0;padding:0;background:var(--bg-deep);color:var(--text);}
-body{font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased;}
+body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased;}
 a{color:var(--accent);text-decoration:none;}
 .wrap{max-width:960px;margin:0 auto;padding:0 16px 48px;}
-
-/* Hero */
-header.hero{text-align:center;padding:48px 0 28px;}
+/* nav */
+nav{display:flex;align-items:center;justify-content:space-between;max-width:960px;margin:0 auto;padding:14px 16px;flex-wrap:wrap;gap:8px;}
+nav .brand{font-weight:700;font-size:18px;color:var(--text);}
+nav .brand span{color:var(--accent);}
+nav .links a{color:var(--text-dim);font-size:14px;margin-left:16px;}
+nav .links a:hover{color:var(--accent);}
+/* hero */
+header.hero{text-align:center;padding:34px 0 24px;}
 .hero .logo{width:72px;height:72px;margin:0 auto 14px;display:block;}
-.hero h1{font-size:30px;margin:0 0 6px;letter-spacing:1px;}
+.hero h1{font-size:30px;margin:0 0 6px;letter-spacing:.5px;}
 .hero h1 .g{color:var(--accent);}
 .hero p{color:var(--text-dim);font-size:15px;margin:0;}
-
-/* 游戏卡片 */
+/* cards */
 .games{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:10px;}
 .game-card{display:flex;flex-direction:column;background:var(--bg-panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:.16s;}
 .game-card:hover{border-color:var(--accent);transform:translateY(-3px);}
-.thumb{height:132px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.thumb{height:132px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .thumb svg{width:100%;height:100%;}
 .game-card .body{padding:14px 16px 16px;display:flex;flex-direction:column;flex:1;}
 .game-card h2{font-size:18px;margin:0 0 2px;}
@@ -36,127 +38,112 @@ header.hero{text-align:center;padding:48px 0 28px;}
 .game-card .desc{font-size:13.5px;color:var(--text-dim);flex:1;}
 .game-card .play{margin-top:12px;background:var(--accent-dim);border:1px solid var(--accent);color:#eafff6;border-radius:8px;padding:9px;text-align:center;font-weight:600;font-size:14px;}
 .game-card .play:hover{background:#238a60;}
-
-/* 广告位 */
+/* ad */
 .ad-region{border-top:1px solid var(--border);margin-top:34px;padding-top:8px;text-align:center;}
-.ad-label{font-size:11px;color:var(--text-dim);letter-spacing:2px;}
+.ad-label{font-size:11px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;}
 .ad-slot{margin:6px auto 0;width:728px;height:90px;max-width:100%;background:#0d131b;border:1px dashed var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#3a4756;font-size:12px;}
 @media(max-width:768px){.ad-slot{width:320px;height:100px;}}
-
-/* 文字内容 */
+/* about */
 section.about{background:var(--bg-panel);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-top:30px;}
 section.about h2{font-size:19px;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:10px;margin:0 0 14px;}
 section.about h3{font-size:15px;margin:16px 0 4px;}
-section.about p{margin:.4em 0;color:var(--text);}
+section.about p{margin:.4em 0;}
 section.about .dim{color:var(--text-dim);font-size:14px;}
-footer{text-align:center;color:var(--text-dim);font-size:12.5px;margin-top:30px;}
-footer a{color:var(--text-dim);text-decoration:underline;}
+footer{border-top:1px solid var(--border);margin-top:30px;padding-top:18px;text-align:center;color:var(--text-dim);font-size:12.5px;}
+footer a{color:var(--text-dim);text-decoration:underline;margin:0 7px;}
 </style>
 </head>
 <body>
+<nav>
+  <a class="brand" href="/">Cell <span>Games</span></a>
+  <div class="links"><a href="/">Home</a><a href="/about.html">About</a><a href="/privacy.html">Privacy</a><a href="/contact.html">Contact</a></div>
+</nav>
 <div class="wrap">
 
   <header class="hero">
     <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <circle cx="50" cy="50" r="44" fill="#101a24" stroke="#3ddc97" stroke-width="3"/>
-      <circle cx="50" cy="50" r="20" fill="#1a6b4a"/>
-      <circle cx="50" cy="50" r="9" fill="#3ddc97"/>
-      <circle cx="30" cy="34" r="5" fill="#3ddc97" opacity=".7"/>
-      <circle cx="70" cy="64" r="6" fill="#3ddc97" opacity=".5"/>
-      <circle cx="68" cy="30" r="4" fill="#3ddc97" opacity=".6"/>
+      <circle cx="50" cy="50" r="20" fill="#1a6b4a"/><circle cx="50" cy="50" r="9" fill="#3ddc97"/>
+      <circle cx="30" cy="34" r="5" fill="#3ddc97" opacity=".7"/><circle cx="70" cy="64" r="6" fill="#3ddc97" opacity=".5"/><circle cx="68" cy="30" r="4" fill="#3ddc97" opacity=".6"/>
     </svg>
     <h1>Cell <span class="g">Games</span></h1>
-    <p>细胞宇宙 · 纯前端网页小游戏 · 打开即玩，免安装免登录</p>
+    <p>A shared cell universe · Free browser games · No install, no sign-up — just play</p>
   </header>
 
   <main>
     <div class="games">
-
-      <!-- Cell Dodge -->
-      <a class="game-card" href="cell-dodge/index.html">
+      <a class="game-card" href="/cell-dodge/">
         <div class="thumb" style="background:radial-gradient(circle at 50% 40%,#12202b,#070c11)">
           <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="100" cy="60" r="16" fill="#3ddc97"/>
-            <circle cx="94" cy="55" r="3" fill="#0a0e14"/><circle cx="106" cy="55" r="3" fill="#0a0e14"/>
-            <circle cx="40" cy="30" r="7" fill="#ff5c6c"/><circle cx="160" cy="40" r="9" fill="#ff5c6c"/>
-            <circle cx="55" cy="95" r="6" fill="#e8b84b"/><circle cx="150" cy="90" r="7" fill="#ff5c6c"/>
-            <circle cx="30" cy="70" r="5" fill="#e8b84b"/><circle cx="175" cy="75" r="5" fill="#e8b84b"/>
+            <circle cx="100" cy="60" r="16" fill="#3ddc97"/><circle cx="94" cy="55" r="3" fill="#0a0e14"/><circle cx="106" cy="55" r="3" fill="#0a0e14"/>
+            <circle cx="40" cy="30" r="7" fill="#ff5c6c"/><circle cx="160" cy="40" r="9" fill="#ff5c6c"/><circle cx="55" cy="95" r="6" fill="#e8b84b"/><circle cx="150" cy="90" r="7" fill="#ff5c6c"/><circle cx="30" cy="70" r="5" fill="#e8b84b"/><circle cx="175" cy="75" r="5" fill="#e8b84b"/>
           </svg>
         </div>
         <div class="body">
-          <h2>细胞闪避 <em>Cell Dodge</em></h2>
-          <span class="tag">弹幕闪避 · 动作</span>
-          <p class="desc">操控一颗细胞在漫天弹幕中穿梭求生，收集升级、挑战 Boss。反应与走位的极限考验。</p>
-          <div class="play">开始游戏 ▸</div>
+          <h2>Cell Dodge</h2>
+          <span class="tag">Bullet-hell · Action</span>
+          <p class="desc">Pilot a single cell through storms of projectiles. Dodge, grab power-ups, and face the boss. A pure test of reflexes and positioning.</p>
+          <div class="play">Play ▸</div>
         </div>
       </a>
 
-      <!-- Cell Culture -->
-      <a class="game-card" href="cell-culture/index.html">
+      <a class="game-card" href="/cell-culture/">
         <div class="thumb" style="background:radial-gradient(circle at 50% 40%,#141f16,#070c08)">
           <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
             <ellipse cx="100" cy="70" rx="60" ry="34" fill="#101a12" stroke="#3ddc97" stroke-width="2"/>
-            <circle cx="80" cy="66" r="7" fill="#7dffcf"/><circle cx="112" cy="60" r="6" fill="#e8c96a"/>
-            <circle cx="98" cy="78" r="8" fill="#3ddc97"/><circle cx="125" cy="76" r="5" fill="#9dff8f"/>
-            <circle cx="72" cy="80" r="5" fill="#8fd6ff"/><circle cx="118" cy="88" r="4" fill="#c98ae0"/>
+            <circle cx="80" cy="66" r="7" fill="#7dffcf"/><circle cx="112" cy="60" r="6" fill="#e8c96a"/><circle cx="98" cy="78" r="8" fill="#3ddc97"/><circle cx="125" cy="76" r="5" fill="#9dff8f"/><circle cx="72" cy="80" r="5" fill="#8fd6ff"/><circle cx="118" cy="88" r="4" fill="#c98ae0"/>
           </svg>
         </div>
         <div class="body">
-          <h2>细胞培养 <em>Cell Culture</em></h2>
-          <span class="tag">放置 · 养成</span>
-          <p class="desc">经营一座培养皿，让细胞自动增殖产出生物量，买升级、解锁品系、传代重置。离开也在赚。</p>
-          <div class="play">开始游戏 ▸</div>
+          <h2>Cell Culture</h2>
+          <span class="tag">Idle · Incremental</span>
+          <p class="desc">Run a petri dish where cells divide and produce biomass on their own. Buy upgrades, unlock strains, and prestige. It keeps earning while you are away.</p>
+          <div class="play">Play ▸</div>
         </div>
       </a>
 
-      <!-- Cell Mimic -->
-      <a class="game-card" href="cell-mimic/index.html">
+      <a class="game-card" href="/cell-mimic/">
         <div class="thumb" style="background:radial-gradient(circle at 50% 40%,#12202b,#070c11)">
           <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
             <path d="M100 20 L108 20 L104 44 Z" fill="#7fb0c9"/>
-            <ellipse cx="60" cy="70" rx="15" ry="12" fill="#fff"/>
-            <circle cx="54" cy="68" r="2.5" fill="#0a0e14"/><circle cx="64" cy="68" r="2.5" fill="#0a0e14"/>
-            <rect x="120" y="55" width="20" height="30" rx="8" fill="#6fd0c4"/>
-            <circle cx="150" cy="40" r="12" fill="#ff5c6c"/>
-            <path d="M150 40 L185 28 L185 52 Z" fill="#ff5c6c" opacity=".18"/>
+            <ellipse cx="60" cy="70" rx="15" ry="12" fill="#fff"/><circle cx="54" cy="68" r="2.5" fill="#0a0e14"/><circle cx="64" cy="68" r="2.5" fill="#0a0e14"/>
+            <rect x="120" y="55" width="20" height="30" rx="8" fill="#6fd0c4"/><circle cx="150" cy="40" r="12" fill="#ff5c6c"/><path d="M150 40 L185 28 L185 52 Z" fill="#ff5c6c" opacity=".18"/>
           </svg>
         </div>
         <div class="body">
-          <h2>细胞拟态 <em>Cell Mimic</em></h2>
-          <span class="tag">躲猫猫 · 策略</span>
-          <p class="desc">逃出培养皿的细胞，拟态成实验器材躲避 AI 巡检者。静止即安全、移动即风险。含躲藏与搜寻双模式。</p>
-          <div class="play">开始游戏 ▸</div>
+          <h2>Cell Mimic</h2>
+          <span class="tag">Hide &amp; Seek · Stealth</span>
+          <p class="desc">A cell that escaped the dish disguises itself as lab equipment to evade an AI inspector. Stay still to stay safe, move and risk being caught. Two modes.</p>
+          <div class="play">Play ▸</div>
         </div>
       </a>
-
     </div>
 
-    <!-- 广告位 -->
     <div class="ad-region">
-      <div class="ad-label">广告</div>
-      <div class="ad-slot" id="ad-home"><!-- AdSense 代码后续插入此处 -->广告位</div>
+      <div class="ad-label">Advertisement</div>
+      <div class="ad-slot" id="ad-home"><!-- AdSense code goes here -->Ad space</div>
     </div>
 
     <section class="about">
-      <h2>关于 Cell Games</h2>
-      <p>Cell Games 是一个围绕"细胞"主题打造的网页小游戏合集，目前收录三款风格迥异、共享同一个细胞宇宙的作品。全部游戏均为<strong>纯前端实现</strong>，无需下载安装、无需注册登录，在电脑或手机浏览器里打开即可游玩，进度保存在你本地的浏览器中。</p>
+      <h2>About Cell Games</h2>
+      <p>Cell Games is a small, independent collection of browser games built around a single theme: the <strong>cell</strong>. Every title is <strong>pure front-end</strong> — nothing to download, no account to create. Open a game in your desktop or mobile browser and play right away. Your progress is saved locally in your own browser.</p>
 
-      <h3>🕹️ 细胞闪避 Cell Dodge</h3>
-      <p class="dim">一款弹幕闪避动作游戏。你操控一颗细胞在密集的弹幕中寻找生路，边躲边收集道具与升级，最终迎战 Boss。考验反应速度与走位判断。</p>
+      <h3>🕹️ Cell Dodge — bullet-hell action</h3>
+      <p class="dim">Steer a lone cell through dense waves of projectiles. Weave between shots, collect drops and upgrades, and survive to the boss. It rewards quick reactions and clean movement.</p>
 
-      <h3>🧫 细胞培养 Cell Culture</h3>
-      <p class="dim">一款放置养成游戏。经营培养皿，细胞会自动分裂产出生物量；用生物量购买升级、解锁从大肠杆菌到合成细胞的 8 种品系，并通过"传代"重置获得永久加成。关掉页面也在累积离线收益。</p>
+      <h3>🧫 Cell Culture — idle incremental</h3>
+      <p class="dim">Manage a petri dish. Cells divide and generate biomass automatically; spend it to buy upgrades and unlock eight strains, from E. coli to a synthetic cell, then prestige for permanent bonuses. It even accrues income while the tab is closed.</p>
 
-      <h3>🔍 细胞拟态 Cell Mimic</h3>
-      <p class="dim">一款俯视躲猫猫游戏。一只逃出培养皿的细胞，靠拟态成实验器材混在同类里躲避 AI 巡检者——静止即安全，移动即风险。既能当躲藏者硬熬计时器，也能切换到巡检搜寻模式亲自揪出伪装的细胞。</p>
+      <h3>🔍 Cell Mimic — top-down hide-and-seek</h3>
+      <p class="dim">A cell that slipped out of the culture flask disguises itself as lab glassware to blend in among identical props and dodge an AI inspector — stay still to stay safe, move and risk suspicion. Play as the hider to outlast the timer, or switch to the seeker mode and root out the disguised cells yourself.</p>
 
-      <p style="margin-top:16px" class="dim">三款游戏同属一个细胞宇宙：细胞拟态里的主角，正是从细胞培养的培养皿里溜出来的那一株。</p>
+      <p style="margin-top:16px" class="dim">All three games share one continuity: the star of Cell Mimic is the very cell that escaped the petri dish in Cell Culture.</p>
     </section>
   </main>
 
   <footer>
-    Cell Games · 纯前端网页游戏 · 数据仅存于你的浏览器<br>
-    © 2026 rickbing.com
+    <div><a href="/about.html">About</a> · <a href="/privacy.html">Privacy Policy</a> · <a href="/terms.html">Terms of Use</a> · <a href="/contact.html">Contact</a></div>
+    <p>© 2026 Cell Games · game.rickbing.com — Pure front-end browser games. Progress is stored only in your browser.</p>
   </footer>
 </div>
 </body>

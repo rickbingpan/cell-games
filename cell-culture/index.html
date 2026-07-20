@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cell Culture · 细胞培养 —— 放置类细胞增殖游戏</title>
-<meta name="description" content="Cell Culture 细胞培养：一款轻量放置类网页游戏。经营培养皿，让大肠杆菌、酵母、干细胞到合成细胞自动增殖产出生物量，购买升级、传代重置获得永久加成，离开也在赚。支持鼠标与触屏。">
+<title>Cell Culture — Idle Cell-Growing Browser Game | Cell Games</title>
+<meta name="description" content="Cell Culture is a lightweight idle game. Run a petri dish where cells from E. coli to a synthetic cell divide and produce biomass automatically. Buy upgrades, unlock strains, and prestige for permanent bonuses. It keeps earning while you are away. Mouse and touch supported.">
 <style>
 :root{
   --bg-deep:#0a0e14;
@@ -146,11 +146,11 @@ textarea.save-io{width:100%;height:90px;background:#0d131b;color:var(--text);bor
 
   <!-- ── 顶部状态条 ── -->
   <header class="topbar">
-    <div class="title">Cell Culture <small>细胞培养</small></div>
+    <div class="title">Cell Culture <small>idle game</small></div>
     <div class="stat-row">
-      <div class="stat"><span>生物量</span><b id="ui-bm">0</b></div>
-      <div class="stat"><span>产出</span><b id="ui-rate">0</b><span style="margin-left:2px">BM/s</span></div>
-      <div class="stat ml" id="ui-ml-wrap" style="display:none"><span>培养基</span><b id="ui-ml">0</b></div>
+      <div class="stat"><span>Biomass</span><b id="ui-bm">0</b></div>
+      <div class="stat"><span>Rate</span><b id="ui-rate">0</b><span style="margin-left:2px">BM/s</span></div>
+      <div class="stat ml" id="ui-ml-wrap" style="display:none"><span>Medium</span><b id="ui-ml">0</b></div>
     </div>
   </header>
 
@@ -159,70 +159,70 @@ textarea.save-io{width:100%;height:90px;background:#0d131b;color:var(--text);bor
     <!-- 培养皿 -->
     <div class="panel dish-panel">
       <div class="dish-box">
-        <canvas id="dish" aria-label="培养皿，点击可获得生物量"></canvas>
+        <canvas id="dish" aria-label="Petri dish, click to gain biomass"></canvas>
       </div>
-      <div class="dish-hint">点击培养皿收获 <b id="ui-click">+1</b> 生物量</div>
+      <div class="dish-hint">Click the dish to harvest <b id="ui-click">+1</b> biomass</div>
     </div>
 
     <!-- 品系列表 + 操作 -->
     <div class="panel list-panel">
       <div class="list-head">
-        <h2>细胞品系</h2>
-        <span class="buyhint">按住 <kbd>Shift</kbd> 批量买 10</span>
+        <h2>Cell Strains</h2>
+        <span class="buyhint">Hold <kbd>Shift</kbd> to buy 10</span>
       </div>
       <div class="strain-list" id="strain-list"></div>
       <div class="actions">
-        <button class="btn" id="btn-upg">升级</button>
-        <button class="btn prestige" id="btn-prestige">传代</button>
-        <button class="btn" id="btn-stats">统计</button>
-        <button class="btn" id="btn-settings">设置</button>
+        <button class="btn" id="btn-upg">Upgrades</button>
+        <button class="btn prestige" id="btn-prestige">Prestige</button>
+        <button class="btn" id="btn-stats">Stats</button>
+        <button class="btn" id="btn-settings">Settings</button>
       </div>
     </div>
   </main>
 
   <!-- ── 广告位（结构保留，AdSense 后续插入） ── -->
   <div class="ad-region">
-    <div class="ad-label">广告</div>
+    <div class="ad-label">Advertisement</div>
     <div class="ad-slot" id="ad-bottom">
-      <!-- AdSense 代码后续插入此处 -->
-      广告位
+      <!-- AdSense code goes here -->
+      Ad space
     </div>
   </div>
 
   <!-- ── 文字内容（SEO / AdSense 审核） ── -->
   <div class="content">
     <section>
-      <h1 style="font-size:20px;color:var(--text)">Cell Culture · 细胞培养</h1>
-      <h2>玩法说明</h2>
-      <p>你经营一座<strong>培养皿</strong>。细胞会自动分裂增殖，源源不断地产出「生物量（Biomass, BM）」。核心循环很简单：<span class="dim">细胞产出生物量 → 花生物量购买更多细胞和升级 → 产出速率提升 → 产出更多生物量</span>，如此滚雪球。</p>
-      <p><strong>如何起步：</strong>开局生物量为零，先反复点击培养皿手动积攒第一桶金，攒够 15 BM 买下第一株大肠杆菌。此后产出会自动累积，点击收益的占比会随着规模扩大而自然下降——这正是放置类游戏的乐趣所在：<strong>离开也在赚，回来有惊喜。</strong></p>
-      <p><strong>传代（Prestige）机制：</strong>当本轮累计生物量达到 10 亿（1e9）后，会解锁「传代」。传代会清空你的生物量、所有细胞和升级，但换来永久货币「培养基（Medium, ML）」，每 1 点培养基提供 +2% 的全局产出加成，且永久保留、跨传代累积。适时传代能让你在下一轮跑得更快、更远。</p>
+      <h1 style="font-size:20px;color:var(--text)">Cell Culture</h1>
+      <h2>How to Play</h2>
+      <p>You run a <strong>petri dish</strong>. The cells divide on their own and steadily produce "biomass" (BM). The core loop is simple: <span class="dim">cells generate biomass → spend biomass on more cells and upgrades → your rate rises → you generate even more biomass</span> — a snowball that keeps growing.</p>
+      <p><strong>Getting started:</strong> you begin with zero biomass, so click the dish to earn your first coins by hand. Once you have 15 BM, buy your first E. coli. From then on income accumulates automatically, and the share coming from clicks naturally shrinks as you scale — that is exactly the appeal of an idle game: <strong>it earns while you are away, and rewards you when you return.</strong></p>
+      <p><strong>Prestige:</strong> once your lifetime biomass this run reaches one billion (1e9), the "Prestige" option unlocks. Prestiging wipes your biomass, all cells, and all upgrades, but grants a permanent currency, "Medium" (ML). Each point of Medium adds +2% to your global output, kept forever and stacking across prestiges. Timing your prestige well lets you run faster and further next time.</p>
     </section>
 
     <section>
-      <h2>操作说明</h2>
-      <p>· <strong>点击培养皿</strong>：手动收获生物量，早期起步全靠它。</p>
-      <p>· <strong>点击右侧品系</strong>：购买一个该品系细胞，成本随持有数量递增。</p>
-      <p>· <strong>按住 <kbd>Shift</kbd> 点击品系</strong>：一次性批量购买最多 10 个。</p>
-      <p>· <strong>升级</strong>：为单个品系购买里程碑升级（产出翻倍），或购买全局升级。</p>
-      <p>· <strong>传代 / 统计 / 设置</strong>：位于品系列表下方；设置里可导出、导入、清除存档。</p>
-      <p class="dim">游戏进度每 10 秒自动保存到本地（localStorage），关闭页面再回来会结算离线收益（效率 50%，上限 12 小时）。</p>
+      <h2>Controls</h2>
+      <p>· <strong>Click the dish</strong>: harvest biomass by hand — essential in the early game.</p>
+      <p>· <strong>Click a strain on the right</strong>: buy one cell of that strain; the cost rises with how many you own.</p>
+      <p>· <strong>Hold <kbd>Shift</kbd> and click a strain</strong>: buy up to 10 at once.</p>
+      <p>· <strong>Upgrades</strong>: buy milestone upgrades for a single strain (double its output), or global upgrades.</p>
+      <p>· <strong>Prestige / Stats / Settings</strong>: below the strain list; Settings lets you export, import, or clear your save.</p>
+      <p class="dim">Progress auto-saves locally (localStorage) every 10 seconds. Close the page and return, and offline income is settled (50% efficiency, capped at 12 hours).</p>
     </section>
 
     <section>
-      <h2>细胞品系图鉴</h2>
+      <h2>Strain Field Guide</h2>
       <div class="codex" id="codex"></div>
     </section>
 
     <section>
-      <h2>更新日志</h2>
+      <h2>Changelog</h2>
       <ul class="changelog" id="changelog">
-        <li><b>v1.0.0</b> · 2026-07-19 · 首发：8 种细胞品系、单株与全局升级、传代系统、离线收益、本地存档与导入导出。</li>
+        <li><b>v1.0.0</b> · 2026-07-19 · Initial release: 8 cell strains, per-strain and global upgrades, prestige system, offline income, local save with import/export.</li>
       </ul>
     </section>
   </div>
 
-  <footer>Cell Culture · 一个纯前端的放置类小游戏 · 无外部依赖 · 数据仅存于你的浏览器</footer>
+  <footer>Cell Culture · A pure front-end idle game · No external dependencies · Data stays only in your browser · <a href="/" style="color:var(--text-dim)">Cell Games</a></footer>
 </div>
 
 <!-- ── 模态框 ── -->
@@ -255,22 +255,22 @@ const CONFIG = {
 
   // 8 种细胞品系
   strains: [
-    { name:"大肠杆菌",   en:"E. coli",         base:15,     rate:0.1,
-      bio:"分子生物学最经典的模式生物，繁殖极快，是基因工程与蛋白表达的主力宿主。" },
-    { name:"酵母菌",     en:"Yeast",           base:100,    rate:1,
-      bio:"单细胞真菌，人类最早驯化的微生物之一，也是研究真核细胞的重要模型。" },
-    { name:"成纤维细胞", en:"Fibroblast",      base:1100,   rate:8,
-      bio:"结缔组织的主要细胞，分泌胶原蛋白，负责伤口愈合与组织的结构支撑。" },
-    { name:"干细胞",     en:"Stem Cell",       base:12000,  rate:47,
-      bio:"具有自我更新与多向分化潜能，是再生医学与组织工程的核心。" },
-    { name:"神经元",     en:"Neuron",          base:130000, rate:260,
-      bio:"通过电化学信号传递信息的细胞，构成神经系统的基本功能单位。" },
-    { name:"心肌细胞",   en:"Cardiomyocyte",   base:1.4e6,  rate:1400,
-      bio:"能自发节律性收缩的肌细胞，正是它们让心脏持续而协调地跳动。" },
-    { name:"类器官",     en:"Organoid",        base:20e6,   rate:7800,
-      bio:"由干细胞三维培养出的微型器官，用于疾病建模、药物筛选与发育研究。" },
-    { name:"合成细胞",   en:"Synthetic Cell",  base:330e6,  rate:44000,
-      bio:"由人工设计基因组构建的生命形式，是合成生物学最前沿的探索。" },
+    { name:"E. coli",        en:"Escherichia coli", base:15,     rate:0.1,
+      bio:"The classic model organism of molecular biology — it multiplies fast and is the workhorse host for genetic engineering and protein expression." },
+    { name:"Yeast",          en:"S. cerevisiae",    base:100,    rate:1,
+      bio:"A single-celled fungus, one of the first microbes humans domesticated, and a key model for studying eukaryotic cells." },
+    { name:"Fibroblast",     en:"connective tissue",base:1100,   rate:8,
+      bio:"The main cell of connective tissue; it secretes collagen and drives wound healing and structural support." },
+    { name:"Stem Cell",      en:"pluripotent",      base:12000,  rate:47,
+      bio:"Capable of self-renewal and of becoming many cell types — the core of regenerative medicine and tissue engineering." },
+    { name:"Neuron",         en:"nerve cell",       base:130000, rate:260,
+      bio:"Transmits information through electrochemical signals; the basic functional unit of the nervous system." },
+    { name:"Cardiomyocyte",  en:"heart muscle",     base:1.4e6,  rate:1400,
+      bio:"A muscle cell that contracts rhythmically on its own — it is what keeps the heart beating steadily." },
+    { name:"Organoid",       en:"3D culture",       base:20e6,   rate:7800,
+      bio:"A miniature organ grown in 3D from stem cells, used for disease modeling, drug screening, and developmental research." },
+    { name:"Synthetic Cell", en:"engineered",       base:330e6,  rate:44000,
+      bio:"A life form built from an artificially designed genome — the leading edge of synthetic biology." },
   ],
 
   // 单株升级：3 档，购买后该品系产出翻倍
@@ -282,9 +282,9 @@ const CONFIG = {
 
   // 全局升级
   globalUpgrades: [
-    { id:"bench",     name:"无菌操作台", rateReq:100,   cost:50000, mult:1.5, desc:"全局产出 ×1.5" },
-    { id:"incubator", name:"恒温培养箱", rateReq:10000, cost:5e6,   mult:2,   desc:"全局产出 ×2" },
-    { id:"crispr",    name:"CRISPR 编辑", rateReq:1e6,   cost:1e9,   mult:3,   desc:"全局产出 ×3" },
+    { id:"bench",     name:"Sterile Bench", rateReq:100,   cost:50000, mult:1.5, desc:"Global output ×1.5" },
+    { id:"incubator", name:"Incubator",     rateReq:10000, cost:5e6,   mult:2,   desc:"Global output ×2" },
+    { id:"crispr",    name:"CRISPR Editing", rateReq:1e6,   cost:1e9,   mult:3,   desc:"Global output ×3" },
   ],
 };
 
@@ -327,9 +327,9 @@ function fmt(n){
 function fmtDuration(sec){
   sec = Math.floor(sec);
   const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
-  if(h > 0) return h + " 小时 " + m + " 分钟";
-  if(m > 0) return m + " 分钟 " + s + " 秒";
-  return s + " 秒";
+  if(h > 0) return h + " h " + m + " min";
+  if(m > 0) return m + " min " + s + " s";
+  return s + " s";
 }
 
 /* ------------------------------------------------------------------ 产出计算 */
@@ -439,14 +439,14 @@ function doPrestige(){
 
 /* ------------------------------------------------------------------ 成就 */
 const ACHIEVEMENTS = [
-  { id:"firstClick", name:"第一次接种", test:()=> state.totalClicks >= 1 },
-  { id:"colony",     name:"第一个菌落", test:()=> state.owned[0] >= 1 },
-  { id:"ten",        name:"扩大培养",   test:()=> state.owned[0] >= 10 },
-  { id:"allStrains", name:"品系齐全",   test:()=> state.owned[7] >= 1 },
-  { id:"rate1k",     name:"千级产线",   test:()=> totalRate() >= 1000 },
-  { id:"rate1m",     name:"百万产线",   test:()=> totalRate() >= 1e6 },
-  { id:"firstPass",  name:"首次传代",   test:()=> state.prestiges >= 1 },
-  { id:"medium10",   name:"培养基大师", test:()=> state.ml >= 10 },
+  { id:"firstClick", name:"First Inoculation", test:()=> state.totalClicks >= 1 },
+  { id:"colony",     name:"First Colony",      test:()=> state.owned[0] >= 1 },
+  { id:"ten",        name:"Scaling Up",        test:()=> state.owned[0] >= 10 },
+  { id:"allStrains", name:"Full Set",          test:()=> state.owned[7] >= 1 },
+  { id:"rate1k",     name:"Kilo Line",         test:()=> totalRate() >= 1000 },
+  { id:"rate1m",     name:"Mega Line",         test:()=> totalRate() >= 1e6 },
+  { id:"firstPass",  name:"First Prestige",    test:()=> state.prestiges >= 1 },
+  { id:"medium10",   name:"Medium Master",     test:()=> state.ml >= 10 },
 ];
 function checkAchievements(){
   for(const a of ACHIEVEMENTS){
@@ -489,14 +489,14 @@ function load(){
     if(!raw) return false;
     const data = JSON.parse(decode(raw));
     if(!data || data.v !== CONFIG.saveVersion || !data.s){
-      console.warn("[CellCulture] 存档版本不符或损坏，回退到新游戏。");
+      console.warn("[CellCulture] Save version mismatch or corrupted; starting a new game.");
       return false;
     }
     state = Object.assign(freshState(), data.s);
     normalize();
     return true;
   }catch(e){
-    console.warn("[CellCulture] 读档失败，回退到新游戏。", e);
+    console.warn("[CellCulture] Failed to load save; starting a new game.", e);
     state = freshState();
     return false;
   }
@@ -504,7 +504,7 @@ function load(){
 function importSave(text){
   try{
     const data = JSON.parse(decode(text.trim()));
-    if(!data || data.v !== CONFIG.saveVersion || !data.s) throw new Error("格式不符");
+    if(!data || data.v !== CONFIG.saveVersion || !data.s) throw new Error("format mismatch");
     state = Object.assign(freshState(), data.s);
     normalize();
     reconcileCells();
@@ -513,7 +513,7 @@ function importSave(text){
     save();
     return true;
   }catch(e){
-    console.warn("[CellCulture] 导入失败", e);
+    console.warn("[CellCulture] Import failed", e);
     return false;
   }
 }
@@ -593,7 +593,7 @@ function updateStrainList(){
       r.row.classList.toggle("afford", afford);
       r.sub.classList.remove("lockmsg");
       const rate = strainRate(i) * globalMult();
-      r.sub.textContent = "产出 " + fmt(rate) + " BM/s";
+      r.sub.textContent = "Rate " + fmt(rate) + " BM/s";
       r.cost.textContent = fmt(cost) + " BM";
       r.cost.className = "cost " + (afford ? "ok" : "no");
       r.cnt.textContent = "×" + state.owned[i];
@@ -601,7 +601,7 @@ function updateStrainList(){
       r.row.classList.add("locked");
       r.row.classList.remove("afford");
       r.sub.classList.add("lockmsg");
-      r.sub.textContent = "解锁：拥有 5 个" + CONFIG.strains[i-1].name;
+      r.sub.textContent = "Unlock: own 5 " + CONFIG.strains[i-1].name;
       r.cost.textContent = "🔒";
       r.cost.className = "cost no";
       r.cnt.textContent = "×0";
@@ -622,7 +622,7 @@ function refreshUI(){
   // 传代按钮
   const pbtn = $("btn-prestige");
   pbtn.classList.toggle("ready", canPrestige());
-  pbtn.textContent = canPrestige() ? "传代 ✦" : "传代";
+  pbtn.textContent = canPrestige() ? "Prestige ✦" : "Prestige";
 }
 
 /* =========================================================================
@@ -642,20 +642,20 @@ function modalHeader(title){
 
 // —— 升级面板 ——
 function renderUpgrades(){
-  let html = modalHeader("升级");
+  let html = modalHeader("Upgrades");
   // 全局升级
-  html += '<h3 style="font-size:14px;color:var(--warn);margin:4px 0 8px">全局升级</h3>';
+  html += '<h3 style="font-size:14px;color:var(--warn);margin:4px 0 8px">Global Upgrades</h3>';
   CONFIG.globalUpgrades.forEach(g=>{
     const owned = state.globalUpg[g.id];
     const can = !owned && totalRate() >= g.rateReq && state.bm >= g.cost;
-    const req = totalRate() < g.rateReq ? ('需 '+fmt(g.rateReq)+' BM/s 解锁') : (fmt(g.cost)+' BM');
+    const req = totalRate() < g.rateReq ? ('Unlock at '+fmt(g.rateReq)+' BM/s') : (fmt(g.cost)+' BM');
     html += '<div class="upg-item '+(owned?"owned":"")+'">'+
         '<div class="info"><div class="t">'+g.name+'</div><div class="d">'+g.desc+'</div></div>'+
         '<button class="btn '+(can?"primary":"")+'" '+(can?"":"disabled")+' data-g="'+g.id+'">'+
-          (owned?"已拥有":req)+'</button></div>';
+          (owned?"Owned":req)+'</button></div>';
   });
   // 单株升级
-  html += '<h3 style="font-size:14px;color:var(--accent);margin:14px 0 8px">品系升级（产出翻倍）</h3>';
+  html += '<h3 style="font-size:14px;color:var(--accent);margin:14px 0 8px">Strain Upgrades (double output)</h3>';
   CONFIG.strains.forEach((s,i)=>{
     if(state.owned[i] < CONFIG.strainUpgrades[0].need && !state.strainUpg[i][0]) return; // 未到最低门槛不显示
     CONFIG.strainUpgrades.forEach((u,t)=>{
@@ -668,14 +668,14 @@ function renderUpgrades(){
       const can = !owned && reachable && state.bm >= cost;
       if(owned || reachable){
         html += '<div class="upg-item '+(owned?"owned":"")+'">'+
-          '<div class="info"><div class="t">'+s.name+' · 升级 '+u.tier+'</div>'+
-          '<div class="d">该品系产出 ×2 · 需拥有 '+u.need+' 个</div></div>'+
+          '<div class="info"><div class="t">'+s.name+' · Upgrade '+u.tier+'</div>'+
+          '<div class="d">Doubles this strain · needs '+u.need+' owned</div></div>'+
           '<button class="btn '+(can?"primary":"")+'" '+(can?"":"disabled")+' data-s="'+i+'" data-t="'+t+'">'+
-          (owned?"已拥有":fmt(cost)+" BM")+'</button></div>';
+          (owned?"Owned":fmt(cost)+" BM")+'</button></div>';
       }
     });
   });
-  html += '<p class="muted-note">提示：品系升级需先拥有足够数量才能购买。</p>';
+  html += '<p class="muted-note">Tip: you must own enough of a strain before you can buy its upgrade.</p>';
   modal.innerHTML = html;
   modal.querySelectorAll("button[data-g]").forEach(b=>b.addEventListener("click",()=>buyGlobalUpgrade(b.dataset.g)));
   modal.querySelectorAll("button[data-s]").forEach(b=>b.addEventListener("click",()=>buyStrainUpgrade(+b.dataset.s, +b.dataset.t)));
@@ -685,20 +685,20 @@ function openUpgrades(){ openModal("upg"); renderUpgrades(); }
 // —— 传代面板 ——
 function renderPrestige(){
   const gain = prestigeGain();
-  let html = modalHeader("传代 Prestige");
+  let html = modalHeader("Prestige");
   if(!canPrestige()){
     const pct = Math.min(100, state.runEarned / CONFIG.prestigeUnlock * 100);
-    html += '<p>累计生物量达到 <b>'+fmt(CONFIG.prestigeUnlock)+'</b> 后可传代。</p>'+
-      '<p class="dim">当前本轮累计：'+fmt(state.runEarned)+' BM（'+pct.toFixed(1)+'%）</p>';
+    html += '<p>Reach <b>'+fmt(CONFIG.prestigeUnlock)+'</b> lifetime biomass this run to prestige.</p>'+
+      '<p class="dim">This run so far: '+fmt(state.runEarned)+' BM ('+pct.toFixed(1)+'%)</p>';
   }else{
-    html += '<p>传代将获得 <b style="color:var(--warn)">'+fmt(gain)+'</b> 点培养基（当前 '+fmt(state.ml)+'）。</p>'+
-      '<p>每点培养基提供 <b>+'+(CONFIG.mlBonusPerPoint*100)+'%</b> 永久全局产出。传代后总加成：<b>+'+
+    html += '<p>Prestiging grants <b style="color:var(--warn)">'+fmt(gain)+'</b> Medium (currently '+fmt(state.ml)+').</p>'+
+      '<p>Each Medium gives <b>+'+(CONFIG.mlBonusPerPoint*100)+'%</b> permanent global output. Total after prestige: <b>+'+
       ((state.ml+gain)*CONFIG.mlBonusPerPoint*100).toFixed(0)+'%</b></p>'+
       '<div style="border:1px solid var(--warn);border-radius:8px;padding:10px;margin:12px 0;font-size:13px">'+
-        '<b style="color:var(--warn)">⚠ 传代会清空：</b><br>· 全部生物量<br>· 所有细胞品系数量<br>· 所有单株与全局升级'+
-        '<br><br><b style="color:var(--accent)">保留：</b>培养基、传代次数、成就'+
+        '<b style="color:var(--warn)">⚠ Prestige clears:</b><br>· All biomass<br>· All cell strain counts<br>· All per-strain and global upgrades'+
+        '<br><br><b style="color:var(--accent)">Kept:</b> Medium, prestige count, achievements'+
       '</div>'+
-      '<button class="btn primary" style="width:100%" id="confirm-prestige">确认传代，获得 '+fmt(gain)+' 培养基</button>';
+      '<button class="btn primary" style="width:100%" id="confirm-prestige">Prestige now — gain '+fmt(gain)+' Medium</button>';
   }
   modal.innerHTML = html;
   const cp = $("confirm-prestige");
@@ -709,16 +709,16 @@ function openPrestige(){ openModal("prestige"); renderPrestige(); }
 // —— 统计面板 ——
 function renderStats(){
   const playSec = (Date.now() - state.playStart)/1000;
-  let html = modalHeader("统计");
-  html += '<div class="stat-line"><span>当前生物量</span><b>'+fmt(state.bm)+'</b></div>';
-  html += '<div class="stat-line"><span>总产出速率</span><b>'+fmt(totalRate())+' BM/s</b></div>';
-  html += '<div class="stat-line"><span>本轮累计产出</span><b>'+fmt(state.runEarned)+'</b></div>';
-  html += '<div class="stat-line"><span>历史累计产出</span><b>'+fmt(state.totalEarned)+'</b></div>';
-  html += '<div class="stat-line"><span>培养基</span><b>'+fmt(state.ml)+' （+'+(state.ml*CONFIG.mlBonusPerPoint*100).toFixed(0)+'%）</b></div>';
-  html += '<div class="stat-line"><span>传代次数</span><b>'+state.prestiges+'</b></div>';
-  html += '<div class="stat-line"><span>手动点击</span><b>'+state.totalClicks+'</b></div>';
-  html += '<div class="stat-line"><span>游玩时长</span><b>'+fmtDuration(playSec)+'</b></div>';
-  html += '<h3 style="font-size:14px;margin:14px 0 4px">成就（'+ACHIEVEMENTS.filter(a=>state.achievements[a.id]).length+'/'+ACHIEVEMENTS.length+'）</h3>';
+  let html = modalHeader("Stats");
+  html += '<div class="stat-line"><span>Current biomass</span><b>'+fmt(state.bm)+'</b></div>';
+  html += '<div class="stat-line"><span>Total rate</span><b>'+fmt(totalRate())+' BM/s</b></div>';
+  html += '<div class="stat-line"><span>This run earned</span><b>'+fmt(state.runEarned)+'</b></div>';
+  html += '<div class="stat-line"><span>Lifetime earned</span><b>'+fmt(state.totalEarned)+'</b></div>';
+  html += '<div class="stat-line"><span>Medium</span><b>'+fmt(state.ml)+' (+'+(state.ml*CONFIG.mlBonusPerPoint*100).toFixed(0)+'%)</b></div>';
+  html += '<div class="stat-line"><span>Prestiges</span><b>'+state.prestiges+'</b></div>';
+  html += '<div class="stat-line"><span>Manual clicks</span><b>'+state.totalClicks+'</b></div>';
+  html += '<div class="stat-line"><span>Playtime</span><b>'+fmtDuration(playSec)+'</b></div>';
+  html += '<h3 style="font-size:14px;margin:14px 0 4px">Achievements ('+ACHIEVEMENTS.filter(a=>state.achievements[a.id]).length+'/'+ACHIEVEMENTS.length+')</h3>';
   html += '<div class="ach-list">';
   ACHIEVEMENTS.forEach(a=>{
     const got = !!state.achievements[a.id];
@@ -732,12 +732,12 @@ function openStats(){ openModal("stats"); renderStats(); }
 // —— 设置面板 ——
 let clearArmed = false;
 function renderSettings(){
-  let html = modalHeader("设置");
-  html += '<p class="dim" style="font-size:12.5px">存档保存在本浏览器 localStorage 中。可导出备份或迁移到其他设备。</p>';
-  html += '<button class="btn" style="width:100%;margin-top:8px" id="btn-export">导出存档</button>';
-  html += '<textarea class="save-io" id="io-box" placeholder="导出的存档会显示在这里；导入时把存档码粘贴到此处后点导入"></textarea>';
-  html += '<button class="btn" style="width:100%;margin-top:6px" id="btn-import">导入存档</button>';
-  html += '<button class="btn warn" style="width:100%;margin-top:14px" id="btn-clear">清除存档</button>';
+  let html = modalHeader("Settings");
+  html += '<p class="dim" style="font-size:12.5px">Your save lives in this browser\'s localStorage. Export it to back up or move to another device.</p>';
+  html += '<button class="btn" style="width:100%;margin-top:8px" id="btn-export">Export Save</button>';
+  html += '<textarea class="save-io" id="io-box" placeholder="Your exported save appears here; to import, paste a save code here and click Import"></textarea>';
+  html += '<button class="btn" style="width:100%;margin-top:6px" id="btn-import">Import Save</button>';
+  html += '<button class="btn warn" style="width:100%;margin-top:14px" id="btn-clear">Clear Save</button>';
   html += '<p class="muted-note" id="set-msg"></p>';
   modal.innerHTML = html;
   clearArmed = false;
@@ -745,19 +745,19 @@ function renderSettings(){
   $("btn-export").addEventListener("click", ()=>{
     save();
     $("io-box").value = encode(JSON.stringify({ v:CONFIG.saveVersion, s:state }));
-    $("set-msg").textContent = "已导出，复制上方文本即可备份。";
+    $("set-msg").textContent = "Exported — copy the text above to back it up.";
   });
   $("btn-import").addEventListener("click", ()=>{
     const txt = $("io-box").value;
-    if(!txt.trim()){ $("set-msg").textContent = "请先粘贴存档码。"; return; }
-    if(importSave(txt)){ $("set-msg").textContent = "导入成功！"; renderSettings(); }
-    else $("set-msg").textContent = "导入失败：存档码无效或版本不符。";
+    if(!txt.trim()){ $("set-msg").textContent = "Paste a save code first."; return; }
+    if(importSave(txt)){ $("set-msg").textContent = "Import successful!"; renderSettings(); }
+    else $("set-msg").textContent = "Import failed: invalid save code or version mismatch.";
   });
   $("btn-clear").addEventListener("click", ()=>{
     if(!clearArmed){
       clearArmed = true;
-      $("btn-clear").textContent = "确定要清除吗？再点一次";
-      $("set-msg").textContent = "清除后进度不可恢复，请谨慎。";
+      $("btn-clear").textContent = "Are you sure? Click again";
+      $("set-msg").textContent = "Clearing is permanent and cannot be undone.";
       return;
     }
     clearSave();
@@ -768,12 +768,12 @@ function openSettings(){ openModal("settings"); renderSettings(); }
 
 // —— 离线收益弹框 ——
 function showOfflineModal(sec, income){
-  let html = modalHeader("欢迎回来 🧫");
-  html += '<p>你离开了 <b>'+fmtDuration(Math.min(sec, CONFIG.offlineCapHours*3600))+'</b>'+
-    (sec > CONFIG.offlineCapHours*3600 ? '（离线收益上限 '+CONFIG.offlineCapHours+' 小时）' : '')+'。</p>';
-  html += '<p style="font-size:15px">培养皿在你不在时产出了：<br><b style="color:var(--accent);font-size:22px">+'+fmt(income)+' BM</b></p>';
-  html += '<p class="dim" style="font-size:12px">（离线效率 '+(CONFIG.offlineEfficiency*100)+'%）</p>';
-  html += '<button class="btn primary" style="width:100%;margin-top:8px" onclick="closeModal()">收下</button>';
+  let html = modalHeader("Welcome back 🧫");
+  html += '<p>You were away for <b>'+fmtDuration(Math.min(sec, CONFIG.offlineCapHours*3600))+'</b>'+
+    (sec > CONFIG.offlineCapHours*3600 ? ' (offline cap '+CONFIG.offlineCapHours+' hours)' : '')+'.</p>';
+  html += '<p style="font-size:15px">While you were gone, the dish produced:<br><b style="color:var(--accent);font-size:22px">+'+fmt(income)+' BM</b></p>';
+  html += '<p class="dim" style="font-size:12px">(offline efficiency '+(CONFIG.offlineEfficiency*100)+'%)</p>';
+  html += '<button class="btn primary" style="width:100%;margin-top:8px" onclick="closeModal()">Collect</button>';
   modal.innerHTML = html;
   openModal("offline");
 }
