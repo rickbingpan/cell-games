@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cell Culture · 细胞培养 —— 放置类细胞增殖游戏</title>
+<meta name="description" content="Cell Culture 细胞培养：一款轻量放置类网页游戏。经营培养皿，让大肠杆菌、酵母、干细胞到合成细胞自动增殖产出生物量，购买升级、传代重置获得永久加成，离开也在赚。支持鼠标与触屏。">
+<style>
+:root{
+  --bg-deep:#0a0e14;
+  --bg-panel:#141b24;
+  --border:#1f2b38;
+  --text:#c8d4e0;
+  --text-dim:#6b7d8f;
+  --accent:#3ddc97;
+  --accent-dim:#1a6b4a;
+  --warn:#e8b84b;
+  --locked:#2a3442;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg-deep);
+  color:var(--text);
+  font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.5;
+  font-size:15px;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent);}
+h1,h2,h3{margin:0 0 .4em;font-weight:600;color:var(--text);}
+.wrap{max-width:1100px;margin:0 auto;padding:10px 12px 40px;}
+
+/* ── 顶部状态条 ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;
+  padding:10px 14px;margin-bottom:12px;
+}
+.topbar .title{font-size:17px;font-weight:700;letter-spacing:.5px;}
+.topbar .title small{color:var(--text-dim);font-weight:400;font-size:12px;margin-left:6px;}
+.stat-row{display:flex;gap:18px;flex-wrap:wrap;align-items:baseline;}
+.stat b{color:var(--accent);font-variant-numeric:tabular-nums;font-size:16px;}
+.stat span{color:var(--text-dim);font-size:12px;margin-right:4px;}
+.stat.ml b{color:var(--warn);}
+
+/* ── 主布局 ── */
+.game-wrap{display:grid;grid-template-columns:minmax(0,1fr) 372px;gap:12px;align-items:start;}
+@media(max-width:900px){.game-wrap{grid-template-columns:1fr;}}
+
+.panel{background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;}
+.dish-panel{padding:10px;display:flex;flex-direction:column;}
+.dish-box{position:relative;width:100%;}
+canvas{width:100%;aspect-ratio:1/1;display:block;border-radius:8px;cursor:pointer;touch-action:manipulation;background:radial-gradient(circle at 50% 45%,#0e1620,#080c12);}
+.dish-hint{text-align:center;color:var(--text-dim);font-size:12px;margin-top:6px;}
+.dish-hint b{color:var(--accent);}
+
+/* ── 品系列表 ── */
+.list-panel{padding:8px;}
+.list-head{display:flex;justify-content:space-between;align-items:center;padding:4px 6px 8px;}
+.list-head h2{font-size:14px;margin:0;}
+.list-head .buyhint{font-size:11px;color:var(--text-dim);}
+.strain-list{max-height:min(52vh,520px);overflow-y:auto;overflow-x:hidden;padding-right:2px;}
+.strain{
+  display:grid;grid-template-columns:38px 1fr auto;gap:8px;align-items:center;
+  padding:8px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;
+  cursor:pointer;user-select:none;transition:border-color .12s,background .12s;
+}
+.strain:hover{border-color:var(--accent-dim);}
+.strain.afford{border-color:var(--accent-dim);}
+.strain.afford:hover{background:rgba(61,220,151,.06);}
+.strain.locked{cursor:default;opacity:.55;background:repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(42,52,66,.25) 8px,rgba(42,52,66,.25) 16px);}
+.strain.locked:hover{border-color:var(--border);}
+.strain .icon{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#0d141d;border:1px solid var(--border);}
+.strain .icon canvas{width:30px;height:30px;background:transparent;border-radius:0;}
+.strain .mid .nm{font-size:14px;font-weight:600;}
+.strain .mid .nm em{font-style:normal;color:var(--text-dim);font-weight:400;font-size:11px;margin-left:5px;}
+.strain .mid .sub{font-size:11px;color:var(--text-dim);}
+.strain .mid .sub.lockmsg{color:var(--warn);}
+.strain .right{text-align:right;}
+.strain .right .cost{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--warn);}
+.strain .right .cost.ok{color:var(--accent);}
+.strain .right .cost.no{color:var(--text-dim);}
+.strain .right .cnt{font-size:12px;color:var(--text-dim);}
+
+/* ── 操作按钮 ── */
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;}
+.btn{
+  background:#0f1620;color:var(--text);border:1px solid var(--border);border-radius:8px;
+  padding:9px 6px;font-size:13px;cursor:pointer;font-family:inherit;transition:.12s;text-align:center;
+}
+.btn:hover{border-color:var(--accent-dim);color:var(--accent);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn.primary{background:var(--accent-dim);border-color:var(--accent);color:#eafff6;}
+.btn.primary:hover{background:#238a60;}
+.btn.warn{border-color:var(--warn);color:var(--warn);}
+.btn.prestige{border-color:var(--warn);color:var(--warn);}
+.btn.prestige.ready{background:rgba(232,184,75,.14);animation:pulseGlow 2s infinite;}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(232,184,75,0);}50%{box-shadow:0 0 10px 1px rgba(232,184,75,.35);}}
+
+/* ── 广告位 ── */
+.ad-region{border-top:1px solid var(--border);margin-top:20px;padding-top:6px;text-align:center;}
+.ad-label{font-size:11px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;}
+.ad-slot{margin:6px auto 0;width:728px;height:90px;max-width:100%;background:#0d131b;border:1px dashed var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#3a4756;font-size:12px;}
+@media(max-width:900px){.ad-slot{width:320px;height:100px;}}
+
+/* ── 内容区 ── */
+.content{margin-top:26px;}
+.content section{background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:14px;}
+.content h2{font-size:17px;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px;}
+.content p{margin:.5em 0;color:var(--text);}
+.content .dim{color:var(--text-dim);}
+.content kbd{background:#0f1620;border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:12px;font-family:inherit;color:var(--accent);}
+.codex{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;}
+.codex .c{background:#0f1620;border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+.codex .c h3{font-size:14px;margin:0 0 4px;}
+.codex .c h3 em{font-style:normal;color:var(--text-dim);font-size:11px;font-weight:400;margin-left:5px;}
+.codex .c p{font-size:12.5px;color:var(--text-dim);margin:0;}
+.changelog li{color:var(--text-dim);font-size:13px;margin-bottom:4px;}
+footer{text-align:center;color:var(--text-dim);font-size:12px;margin-top:24px;}
+
+/* ── 模态框 ── */
+.overlay{position:fixed;inset:0;background:rgba(4,7,11,.72);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}
+.overlay.show{display:flex;}
+.modal{background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;max-width:480px;width:100%;max-height:88vh;overflow-y:auto;padding:18px 20px;}
+.modal h2{font-size:18px;margin-bottom:12px;}
+.modal .close{float:right;cursor:pointer;color:var(--text-dim);font-size:20px;line-height:1;border:none;background:none;}
+.modal .close:hover{color:var(--text);}
+.upg-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;}
+.upg-item .info .t{font-size:13.5px;font-weight:600;}
+.upg-item .info .d{font-size:11.5px;color:var(--text-dim);}
+.upg-item.owned{opacity:.6;border-color:var(--accent-dim);}
+.upg-item.owned .buy{color:var(--accent);}
+.stat-line{display:flex;justify-content:space-between;padding:5px 2px;border-bottom:1px solid var(--border);font-size:13.5px;}
+.stat-line span{color:var(--text-dim);}
+.stat-line b{font-variant-numeric:tabular-nums;}
+textarea.save-io{width:100%;height:90px;background:#0d131b;color:var(--text);border:1px solid var(--border);border-radius:6px;padding:8px;font-family:monospace;font-size:11px;resize:vertical;margin-top:8px;}
+.ach-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.ach{font-size:11.5px;padding:4px 8px;border-radius:14px;border:1px solid var(--border);color:var(--text-dim);}
+.ach.got{border-color:var(--accent-dim);color:var(--accent);background:rgba(61,220,151,.08);}
+.muted-note{font-size:11.5px;color:var(--text-dim);margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ── 顶部状态条 ── -->
+  <header class="topbar">
+    <div class="title">Cell Culture <small>细胞培养</small></div>
+    <div class="stat-row">
+      <div class="stat"><span>生物量</span><b id="ui-bm">0</b></div>
+      <div class="stat"><span>产出</span><b id="ui-rate">0</b><span style="margin-left:2px">BM/s</span></div>
+      <div class="stat ml" id="ui-ml-wrap" style="display:none"><span>培养基</span><b id="ui-ml">0</b></div>
+    </div>
+  </header>
+
+  <!-- ── 主游戏区 ── -->
+  <main class="game-wrap">
+    <!-- 培养皿 -->
+    <div class="panel dish-panel">
+      <div class="dish-box">
+        <canvas id="dish" aria-label="培养皿，点击可获得生物量"></canvas>
+      </div>
+      <div class="dish-hint">点击培养皿收获 <b id="ui-click">+1</b> 生物量</div>
+    </div>
+
+    <!-- 品系列表 + 操作 -->
+    <div class="panel list-panel">
+      <div class="list-head">
+        <h2>细胞品系</h2>
+        <span class="buyhint">按住 <kbd>Shift</kbd> 批量买 10</span>
+      </div>
+      <div class="strain-list" id="strain-list"></div>
+      <div class="actions">
+        <button class="btn" id="btn-upg">升级</button>
+        <button class="btn prestige" id="btn-prestige">传代</button>
+        <button class="btn" id="btn-stats">统计</button>
+        <button class="btn" id="btn-settings">设置</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── 广告位（结构保留，AdSense 后续插入） ── -->
+  <div class="ad-region">
+    <div class="ad-label">广告</div>
+    <div class="ad-slot" id="ad-bottom">
+      <!-- AdSense 代码后续插入此处 -->
+      广告位
+    </div>
+  </div>
+
+  <!-- ── 文字内容（SEO / AdSense 审核） ── -->
+  <div class="content">
+    <section>
+      <h1 style="font-size:20px;color:var(--text)">Cell Culture · 细胞培养</h1>
+      <h2>玩法说明</h2>
+      <p>你经营一座<strong>培养皿</strong>。细胞会自动分裂增殖，源源不断地产出「生物量（Biomass, BM）」。核心循环很简单：<span class="dim">细胞产出生物量 → 花生物量购买更多细胞和升级 → 产出速率提升 → 产出更多生物量</span>，如此滚雪球。</p>
+      <p><strong>如何起步：</strong>开局生物量为零，先反复点击培养皿手动积攒第一桶金，攒够 15 BM 买下第一株大肠杆菌。此后产出会自动累积，点击收益的占比会随着规模扩大而自然下降——这正是放置类游戏的乐趣所在：<strong>离开也在赚，回来有惊喜。</strong></p>
+      <p><strong>传代（Prestige）机制：</strong>当本轮累计生物量达到 10 亿（1e9）后，会解锁「传代」。传代会清空你的生物量、所有细胞和升级，但换来永久货币「培养基（Medium, ML）」，每 1 点培养基提供 +2% 的全局产出加成，且永久保留、跨传代累积。适时传代能让你在下一轮跑得更快、更远。</p>
+    </section>
+
+    <section>
+      <h2>操作说明</h2>
+      <p>· <strong>点击培养皿</strong>：手动收获生物量，早期起步全靠它。</p>
+      <p>· <strong>点击右侧品系</strong>：购买一个该品系细胞，成本随持有数量递增。</p>
+      <p>· <strong>按住 <kbd>Shift</kbd> 点击品系</strong>：一次性批量购买最多 10 个。</p>
+      <p>· <strong>升级</strong>：为单个品系购买里程碑升级（产出翻倍），或购买全局升级。</p>
+      <p>· <strong>传代 / 统计 / 设置</strong>：位于品系列表下方；设置里可导出、导入、清除存档。</p>
+      <p class="dim">游戏进度每 10 秒自动保存到本地（localStorage），关闭页面再回来会结算离线收益（效率 50%，上限 12 小时）。</p>
+    </section>
+
+    <section>
+      <h2>细胞品系图鉴</h2>
+      <div class="codex" id="codex"></div>
+    </section>
+
+    <section>
+      <h2>更新日志</h2>
+      <ul class="changelog" id="changelog">
+        <li><b>v1.0.0</b> · 2026-07-19 · 首发：8 种细胞品系、单株与全局升级、传代系统、离线收益、本地存档与导入导出。</li>
+      </ul>
+    </section>
+  </div>
+
+  <footer>Cell Culture · 一个纯前端的放置类小游戏 · 无外部依赖 · 数据仅存于你的浏览器</footer>
+</div>
+
+<!-- ── 模态框 ── -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+"use strict";
+/* =========================================================================
+   Cell Culture — 单文件放置游戏
+   所有可调数值集中在 CONFIG，方便后期平衡。
+   ========================================================================= */
+
+/* ------------------------------------------------------------------ CONFIG */
+const CONFIG = {
+  saveKey: "cellCulture_save_v1",
+  saveVersion: 1,
+  autosaveMs: 10000,      // 自动存档间隔
+  tickMs: 100,            // 逻辑固定步长
+  clickFactor: 0.05,      // 点击收益 = max(1, 总BM/s × clickFactor)
+  offlineEfficiency: 0.5, // 离线效率
+  offlineCapHours: 12,    // 离线收益上限
+  offlineMinSeconds: 60,  // 低于此秒数静默结算、不弹框
+  prestigeUnlock: 1e9,    // 传代解锁门槛（本轮累计BM）
+  prestigeDivisor: 1e9,   // ML = floor(sqrt(累计BM / divisor))
+  mlBonusPerPoint: 0.02,  // 每点培养基 +2% 全局产出
+  costGrowth: 1.15,       // 成本增长系数
+  renderCap: 150,         // 培养皿渲染实体上限
+
+  // 8 种细胞品系
+  strains: [
+    { name:"大肠杆菌",   en:"E. coli",         base:15,     rate:0.1,
+      bio:"分子生物学最经典的模式生物，繁殖极快，是基因工程与蛋白表达的主力宿主。" },
+    { name:"酵母菌",     en:"Yeast",           base:100,    rate:1,
+      bio:"单细胞真菌，人类最早驯化的微生物之一，也是研究真核细胞的重要模型。" },
+    { name:"成纤维细胞", en:"Fibroblast",      base:1100,   rate:8,
+      bio:"结缔组织的主要细胞，分泌胶原蛋白，负责伤口愈合与组织的结构支撑。" },
+    { name:"干细胞",     en:"Stem Cell",       base:12000,  rate:47,
+      bio:"具有自我更新与多向分化潜能，是再生医学与组织工程的核心。" },
+    { name:"神经元",     en:"Neuron",          base:130000, rate:260,
+      bio:"通过电化学信号传递信息的细胞，构成神经系统的基本功能单位。" },
+    { name:"心肌细胞",   en:"Cardiomyocyte",   base:1.4e6,  rate:1400,
+      bio:"能自发节律性收缩的肌细胞，正是它们让心脏持续而协调地跳动。" },
+    { name:"类器官",     en:"Organoid",        base:20e6,   rate:7800,
+      bio:"由干细胞三维培养出的微型器官，用于疾病建模、药物筛选与发育研究。" },
+    { name:"合成细胞",   en:"Synthetic Cell",  base:330e6,  rate:44000,
+      bio:"由人工设计基因组构建的生命形式，是合成生物学最前沿的探索。" },
+  ],
+
+  // 单株升级：3 档，购买后该品系产出翻倍
+  strainUpgrades: [
+    { tier:"I",   need:10, costMul:10  },
+    { tier:"II",  need:25, costMul:50  },
+    { tier:"III", need:50, costMul:250 },
+  ],
+
+  // 全局升级
+  globalUpgrades: [
+    { id:"bench",     name:"无菌操作台", rateReq:100,   cost:50000, mult:1.5, desc:"全局产出 ×1.5" },
+    { id:"incubator", name:"恒温培养箱", rateReq:10000, cost:5e6,   mult:2,   desc:"全局产出 ×2" },
+    { id:"crispr",    name:"CRISPR 编辑", rateReq:1e6,   cost:1e9,   mult:3,   desc:"全局产出 ×3" },
+  ],
+};
+
+// 每个品系的绘制颜色
+const CELL_COLORS = ["#8fd6ff","#e8c96a","#c98ae0","#7dffcf","#ff9d7d","#ff7d9d","#9dff8f","#b0b8ff"];
+
+/* ------------------------------------------------------------------ STATE */
+function freshState(){
+  return {
+    bm: 0,                         // 当前生物量
+    runEarned: 0,                  // 本轮累计产出（用于传代）
+    totalEarned: 0,                // 历史累计产出
+    owned: new Array(8).fill(0),   // 各品系持有数
+    strainUpg: Array.from({length:8}, ()=>[false,false,false]),
+    globalUpg: { bench:false, incubator:false, crispr:false },
+    ml: 0,                         // 培养基
+    prestiges: 0,                  // 传代次数
+    totalClicks: 0,
+    achievements: {},              // 成就
+    playStart: Date.now(),
+    lastSaveTime: Date.now(),
+  };
+}
+let state = freshState();
+
+/* ------------------------------------------------------------------ 数值 & 格式化 */
+const SUFFIX = ["","K","M","B","T","Qa","Qi","Sx","Sp","Oc","No","Dc"];
+function fmt(n){
+  if(!isFinite(n)) return "∞";
+  if(n < 0) return "-" + fmt(-n);
+  if(n < 1000){
+    // < 1000 保留 1 位小数（整数则直接显示）
+    return (Math.abs(n - Math.round(n)) < 1e-9) ? String(Math.round(n)) : n.toFixed(1);
+  }
+  let tier = Math.floor(Math.log10(n) / 3);
+  if(tier >= SUFFIX.length) tier = SUFFIX.length - 1;
+  const scaled = n / Math.pow(10, tier * 3);
+  return scaled.toFixed(2) + SUFFIX[tier];
+}
+function fmtDuration(sec){
+  sec = Math.floor(sec);
+  const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
+  if(h > 0) return h + " 小时 " + m + " 分钟";
+  if(m > 0) return m + " 分钟 " + s + " 秒";
+  return s + " 秒";
+}
+
+/* ------------------------------------------------------------------ 产出计算 */
+function strainRate(i){
+  if(state.owned[i] <= 0) return 0;
+  let r = CONFIG.strains[i].rate * state.owned[i];
+  for(let t=0; t<3; t++) if(state.strainUpg[i][t]) r *= 2;
+  return r;
+}
+function globalMult(){
+  let m = 1;
+  if(state.globalUpg.bench)     m *= CONFIG.globalUpgrades[0].mult;
+  if(state.globalUpg.incubator) m *= CONFIG.globalUpgrades[1].mult;
+  if(state.globalUpg.crispr)    m *= CONFIG.globalUpgrades[2].mult;
+  m *= (1 + state.ml * CONFIG.mlBonusPerPoint);
+  return m;
+}
+function totalRate(){
+  let base = 0;
+  for(let i=0; i<8; i++) base += strainRate(i);
+  return base * globalMult();
+}
+function clickGain(){ return Math.max(1, totalRate() * CONFIG.clickFactor); }
+
+function strainCost(i){ return CONFIG.strains[i].base * Math.pow(CONFIG.costGrowth, state.owned[i]); }
+function unlocked(i){ return i === 0 || state.owned[i-1] >= 5; }
+function prestigeGain(){ return Math.floor(Math.sqrt(state.runEarned / CONFIG.prestigeDivisor)); }
+function canPrestige(){ return state.runEarned >= CONFIG.prestigeUnlock; }
+
+/* ------------------------------------------------------------------ 逻辑步进 */
+let logicAcc = 0;
+let lastLogic = Date.now();
+
+function step(seconds){
+  const gain = totalRate() * seconds;
+  if(gain > 0){
+    state.bm += gain;
+    state.runEarned += gain;
+    state.totalEarned += gain;
+  }
+}
+function processTime(){
+  const now = Date.now();
+  let dt = now - lastLogic;
+  lastLogic = now;
+  if(dt < 0) dt = 0;
+  logicAcc += dt;
+  // 防止极端补算卡死：单次最多补 25 万 tick
+  let guard = 250000;
+  while(logicAcc >= CONFIG.tickMs && guard-- > 0){
+    logicAcc -= CONFIG.tickMs;
+    step(CONFIG.tickMs / 1000);
+  }
+  if(guard <= 0) logicAcc = 0;
+}
+
+/* ------------------------------------------------------------------ 购买 */
+function buyStrain(i, amount){
+  if(!unlocked(i)) return;
+  let bought = 0;
+  for(let k=0; k<amount; k++){
+    const c = strainCost(i);
+    if(state.bm >= c){ state.bm -= c; state.owned[i]++; bought++; }
+    else break;
+  }
+  if(bought > 0){
+    checkAchievements();
+    reconcileCells();
+    refreshUI();
+    if(modalOpen === "upg") renderUpgrades();
+  }
+}
+function buyStrainUpgrade(i, t){
+  if(state.strainUpg[i][t]) return;
+  if(state.owned[i] < CONFIG.strainUpgrades[t].need) return;
+  const cost = CONFIG.strains[i].base * CONFIG.strainUpgrades[t].costMul;
+  if(state.bm < cost) return;
+  state.bm -= cost;
+  state.strainUpg[i][t] = true;
+  refreshUI(); renderUpgrades();
+}
+function buyGlobalUpgrade(id){
+  const g = CONFIG.globalUpgrades.find(x=>x.id===id);
+  if(!g || state.globalUpg[id]) return;
+  if(totalRate() < g.rateReq || state.bm < g.cost) return;
+  state.bm -= g.cost;
+  state.globalUpg[id] = true;
+  refreshUI(); renderUpgrades();
+}
+function doPrestige(){
+  if(!canPrestige()) return;
+  const gain = prestigeGain();
+  state.ml += gain;
+  state.prestiges += 1;
+  // 清空：生物量、品系、升级、本轮累计
+  state.bm = 0;
+  state.runEarned = 0;
+  state.owned = new Array(8).fill(0);
+  state.strainUpg = Array.from({length:8}, ()=>[false,false,false]);
+  state.globalUpg = { bench:false, incubator:false, crispr:false };
+  checkAchievements();
+  reconcileCells();
+  closeModal();
+  refreshUI();
+  save();
+}
+
+/* ------------------------------------------------------------------ 成就 */
+const ACHIEVEMENTS = [
+  { id:"firstClick", name:"第一次接种", test:()=> state.totalClicks >= 1 },
+  { id:"colony",     name:"第一个菌落", test:()=> state.owned[0] >= 1 },
+  { id:"ten",        name:"扩大培养",   test:()=> state.owned[0] >= 10 },
+  { id:"allStrains", name:"品系齐全",   test:()=> state.owned[7] >= 1 },
+  { id:"rate1k",     name:"千级产线",   test:()=> totalRate() >= 1000 },
+  { id:"rate1m",     name:"百万产线",   test:()=> totalRate() >= 1e6 },
+  { id:"firstPass",  name:"首次传代",   test:()=> state.prestiges >= 1 },
+  { id:"medium10",   name:"培养基大师", test:()=> state.ml >= 10 },
+];
+function checkAchievements(){
+  for(const a of ACHIEVEMENTS){
+    if(!state.achievements[a.id] && a.test()){
+      state.achievements[a.id] = true;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ 存档 */
+function encode(str){ return btoa(unescape(encodeURIComponent(str))); }
+function decode(str){ return decodeURIComponent(escape(atob(str))); }
+
+function save(){
+  state.lastSaveTime = Date.now();
+  try{
+    const payload = { v: CONFIG.saveVersion, s: state };
+    localStorage.setItem(CONFIG.saveKey, encode(JSON.stringify(payload)));
+  }catch(e){ /* localStorage 不可用（如 file:// 隐私模式），忽略 */ }
+}
+function normalize(){
+  // 容错：确保结构完整、数值合法
+  if(!Array.isArray(state.owned) || state.owned.length !== 8) state.owned = new Array(8).fill(0);
+  for(let i=0;i<8;i++){ if(!isFinite(state.owned[i])||state.owned[i]<0) state.owned[i]=0; state.owned[i]=Math.floor(state.owned[i]); }
+  if(!Array.isArray(state.strainUpg) || state.strainUpg.length !== 8)
+    state.strainUpg = Array.from({length:8}, ()=>[false,false,false]);
+  for(let i=0;i<8;i++){ if(!Array.isArray(state.strainUpg[i])||state.strainUpg[i].length!==3) state.strainUpg[i]=[false,false,false]; }
+  if(!state.globalUpg) state.globalUpg = { bench:false, incubator:false, crispr:false };
+  ["bench","incubator","crispr"].forEach(k=>{ state.globalUpg[k] = !!state.globalUpg[k]; });
+  ["bm","runEarned","totalEarned","ml","prestiges","totalClicks"].forEach(k=>{
+    if(!isFinite(state[k]) || state[k] < 0) state[k] = 0;
+  });
+  if(!state.achievements || typeof state.achievements !== "object") state.achievements = {};
+  if(!isFinite(state.lastSaveTime)) state.lastSaveTime = Date.now();
+  if(!isFinite(state.playStart)) state.playStart = Date.now();
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(CONFIG.saveKey);
+    if(!raw) return false;
+    const data = JSON.parse(decode(raw));
+    if(!data || data.v !== CONFIG.saveVersion || !data.s){
+      console.warn("[CellCulture] 存档版本不符或损坏，回退到新游戏。");
+      return false;
+    }
+    state = Object.assign(freshState(), data.s);
+    normalize();
+    return true;
+  }catch(e){
+    console.warn("[CellCulture] 读档失败，回退到新游戏。", e);
+    state = freshState();
+    return false;
+  }
+}
+function importSave(text){
+  try{
+    const data = JSON.parse(decode(text.trim()));
+    if(!data || data.v !== CONFIG.saveVersion || !data.s) throw new Error("格式不符");
+    state = Object.assign(freshState(), data.s);
+    normalize();
+    reconcileCells();
+    lastLogic = Date.now();
+    refreshUI();
+    save();
+    return true;
+  }catch(e){
+    console.warn("[CellCulture] 导入失败", e);
+    return false;
+  }
+}
+function clearSave(){
+  try{ localStorage.removeItem(CONFIG.saveKey); }catch(e){}
+  state = freshState();
+  reconcileCells();
+  lastLogic = Date.now();
+  logicAcc = 0;
+  refreshUI();
+}
+
+/* ------------------------------------------------------------------ 离线收益 */
+function applyOffline(){
+  const now = Date.now();
+  let dt = (now - state.lastSaveTime) / 1000;
+  if(dt < 0) dt = 0;
+  const capped = Math.min(dt, CONFIG.offlineCapHours * 3600);
+  const income = totalRate() * capped * CONFIG.offlineEfficiency;
+  if(income > 0){
+    state.bm += income;
+    state.runEarned += income;
+    state.totalEarned += income;
+  }
+  state.lastSaveTime = now;
+  if(dt >= CONFIG.offlineMinSeconds && income > 0){
+    showOfflineModal(dt, income);
+  }
+}
+
+/* =========================================================================
+   UI —— DOM 构建与更新
+   ========================================================================= */
+const $ = (id)=>document.getElementById(id);
+const listEl = $("strain-list");
+let rowEls = [];   // 每个品系行的元素引用，只更新文本节点，不重建 DOM
+
+function buildStrainList(){
+  listEl.innerHTML = "";
+  rowEls = [];
+  CONFIG.strains.forEach((s, i)=>{
+    const row = document.createElement("div");
+    row.className = "strain";
+    row.innerHTML =
+      '<div class="icon"><canvas width="30" height="30"></canvas></div>' +
+      '<div class="mid"><div class="nm">'+s.name+'<em>'+s.en+'</em></div>' +
+      '<div class="sub"></div></div>' +
+      '<div class="right"><div class="cost">—</div><div class="cnt">×0</div></div>';
+    row.addEventListener("click", (e)=> buyStrain(i, e.shiftKey ? 10 : 1));
+    listEl.appendChild(row);
+    rowEls.push({
+      row,
+      icon: row.querySelector(".icon canvas"),
+      sub: row.querySelector(".sub"),
+      cost: row.querySelector(".cost"),
+      cnt: row.querySelector(".cnt"),
+      iconDrawn: false,
+    });
+    // 品系图标（静态小画）
+    drawStrainIcon(rowEls[i].icon, i);
+  });
+}
+function drawStrainIcon(cv, i){
+  const c = cv.getContext("2d");
+  c.clearRect(0,0,30,30);
+  drawCellShape(c, 15, 15, 9, i, 0, 0, 1);
+}
+
+// 刷新品系列表（仅文本/类名，不重建节点）
+function updateStrainList(){
+  for(let i=0;i<8;i++){
+    const r = rowEls[i];
+    if(unlocked(i)){
+      const cost = strainCost(i);
+      const afford = state.bm >= cost;
+      r.row.classList.remove("locked");
+      r.row.classList.toggle("afford", afford);
+      r.sub.classList.remove("lockmsg");
+      const rate = strainRate(i) * globalMult();
+      r.sub.textContent = "产出 " + fmt(rate) + " BM/s";
+      r.cost.textContent = fmt(cost) + " BM";
+      r.cost.className = "cost " + (afford ? "ok" : "no");
+      r.cnt.textContent = "×" + state.owned[i];
+    }else{
+      r.row.classList.add("locked");
+      r.row.classList.remove("afford");
+      r.sub.classList.add("lockmsg");
+      r.sub.textContent = "解锁：拥有 5 个" + CONFIG.strains[i-1].name;
+      r.cost.textContent = "🔒";
+      r.cost.className = "cost no";
+      r.cnt.textContent = "×0";
+    }
+  }
+}
+
+// 顶部状态 + 按钮态
+function refreshUI(){
+  $("ui-bm").textContent = fmt(state.bm);
+  $("ui-rate").textContent = fmt(totalRate());
+  $("ui-click").textContent = "+" + fmt(clickGain());
+  if(state.ml > 0 || state.prestiges > 0){
+    $("ui-ml-wrap").style.display = "";
+    $("ui-ml").textContent = fmt(state.ml);
+  }
+  updateStrainList();
+  // 传代按钮
+  const pbtn = $("btn-prestige");
+  pbtn.classList.toggle("ready", canPrestige());
+  pbtn.textContent = canPrestige() ? "传代 ✦" : "传代";
+}
+
+/* =========================================================================
+   模态框
+   ========================================================================= */
+const overlay = $("overlay");
+const modal = $("modal");
+let modalOpen = null;
+
+function openModal(kind){ modalOpen = kind; overlay.classList.add("show"); }
+function closeModal(){ modalOpen = null; overlay.classList.remove("show"); modal.innerHTML = ""; }
+overlay.addEventListener("click", (e)=>{ if(e.target === overlay) closeModal(); });
+
+function modalHeader(title){
+  return '<button class="close" onclick="closeModal()">×</button><h2>'+title+'</h2>';
+}
+
+// —— 升级面板 ——
+function renderUpgrades(){
+  let html = modalHeader("升级");
+  // 全局升级
+  html += '<h3 style="font-size:14px;color:var(--warn);margin:4px 0 8px">全局升级</h3>';
+  CONFIG.globalUpgrades.forEach(g=>{
+    const owned = state.globalUpg[g.id];
+    const can = !owned && totalRate() >= g.rateReq && state.bm >= g.cost;
+    const req = totalRate() < g.rateReq ? ('需 '+fmt(g.rateReq)+' BM/s 解锁') : (fmt(g.cost)+' BM');
+    html += '<div class="upg-item '+(owned?"owned":"")+'">'+
+        '<div class="info"><div class="t">'+g.name+'</div><div class="d">'+g.desc+'</div></div>'+
+        '<button class="btn '+(can?"primary":"")+'" '+(can?"":"disabled")+' data-g="'+g.id+'">'+
+          (owned?"已拥有":req)+'</button></div>';
+  });
+  // 单株升级
+  html += '<h3 style="font-size:14px;color:var(--accent);margin:14px 0 8px">品系升级（产出翻倍）</h3>';
+  CONFIG.strains.forEach((s,i)=>{
+    if(state.owned[i] < CONFIG.strainUpgrades[0].need && !state.strainUpg[i][0]) return; // 未到最低门槛不显示
+    CONFIG.strainUpgrades.forEach((u,t)=>{
+      const owned = state.strainUpg[i][t];
+      const reachable = state.owned[i] >= u.need;
+      if(!owned && !reachable && (t===0 || !state.strainUpg[i][t-1])) {
+        // 只显示下一个可达/接近的档
+      }
+      const cost = s.base * u.costMul;
+      const can = !owned && reachable && state.bm >= cost;
+      if(owned || reachable){
+        html += '<div class="upg-item '+(owned?"owned":"")+'">'+
+          '<div class="info"><div class="t">'+s.name+' · 升级 '+u.tier+'</div>'+
+          '<div class="d">该品系产出 ×2 · 需拥有 '+u.need+' 个</div></div>'+
+          '<button class="btn '+(can?"primary":"")+'" '+(can?"":"disabled")+' data-s="'+i+'" data-t="'+t+'">'+
+          (owned?"已拥有":fmt(cost)+" BM")+'</button></div>';
+      }
+    });
+  });
+  html += '<p class="muted-note">提示：品系升级需先拥有足够数量才能购买。</p>';
+  modal.innerHTML = html;
+  modal.querySelectorAll("button[data-g]").forEach(b=>b.addEventListener("click",()=>buyGlobalUpgrade(b.dataset.g)));
+  modal.querySelectorAll("button[data-s]").forEach(b=>b.addEventListener("click",()=>buyStrainUpgrade(+b.dataset.s, +b.dataset.t)));
+}
+function openUpgrades(){ openModal("upg"); renderUpgrades(); }
+
+// —— 传代面板 ——
+function renderPrestige(){
+  const gain = prestigeGain();
+  let html = modalHeader("传代 Prestige");
+  if(!canPrestige()){
+    const pct = Math.min(100, state.runEarned / CONFIG.prestigeUnlock * 100);
+    html += '<p>累计生物量达到 <b>'+fmt(CONFIG.prestigeUnlock)+'</b> 后可传代。</p>'+
+      '<p class="dim">当前本轮累计：'+fmt(state.runEarned)+' BM（'+pct.toFixed(1)+'%）</p>';
+  }else{
+    html += '<p>传代将获得 <b style="color:var(--warn)">'+fmt(gain)+'</b> 点培养基（当前 '+fmt(state.ml)+'）。</p>'+
+      '<p>每点培养基提供 <b>+'+(CONFIG.mlBonusPerPoint*100)+'%</b> 永久全局产出。传代后总加成：<b>+'+
+      ((state.ml+gain)*CONFIG.mlBonusPerPoint*100).toFixed(0)+'%</b></p>'+
+      '<div style="border:1px solid var(--warn);border-radius:8px;padding:10px;margin:12px 0;font-size:13px">'+
+        '<b style="color:var(--warn)">⚠ 传代会清空：</b><br>· 全部生物量<br>· 所有细胞品系数量<br>· 所有单株与全局升级'+
+        '<br><br><b style="color:var(--accent)">保留：</b>培养基、传代次数、成就'+
+      '</div>'+
+      '<button class="btn primary" style="width:100%" id="confirm-prestige">确认传代，获得 '+fmt(gain)+' 培养基</button>';
+  }
+  modal.innerHTML = html;
+  const cp = $("confirm-prestige");
+  if(cp) cp.addEventListener("click", doPrestige);
+}
+function openPrestige(){ openModal("prestige"); renderPrestige(); }
+
+// —— 统计面板 ——
+function renderStats(){
+  const playSec = (Date.now() - state.playStart)/1000;
+  let html = modalHeader("统计");
+  html += '<div class="stat-line"><span>当前生物量</span><b>'+fmt(state.bm)+'</b></div>';
+  html += '<div class="stat-line"><span>总产出速率</span><b>'+fmt(totalRate())+' BM/s</b></div>';
+  html += '<div class="stat-line"><span>本轮累计产出</span><b>'+fmt(state.runEarned)+'</b></div>';
+  html += '<div class="stat-line"><span>历史累计产出</span><b>'+fmt(state.totalEarned)+'</b></div>';
+  html += '<div class="stat-line"><span>培养基</span><b>'+fmt(state.ml)+' （+'+(state.ml*CONFIG.mlBonusPerPoint*100).toFixed(0)+'%）</b></div>';
+  html += '<div class="stat-line"><span>传代次数</span><b>'+state.prestiges+'</b></div>';
+  html += '<div class="stat-line"><span>手动点击</span><b>'+state.totalClicks+'</b></div>';
+  html += '<div class="stat-line"><span>游玩时长</span><b>'+fmtDuration(playSec)+'</b></div>';
+  html += '<h3 style="font-size:14px;margin:14px 0 4px">成就（'+ACHIEVEMENTS.filter(a=>state.achievements[a.id]).length+'/'+ACHIEVEMENTS.length+'）</h3>';
+  html += '<div class="ach-list">';
+  ACHIEVEMENTS.forEach(a=>{
+    const got = !!state.achievements[a.id];
+    html += '<span class="ach '+(got?"got":"")+'">'+(got?"✓ ":"")+a.name+'</span>';
+  });
+  html += '</div>';
+  modal.innerHTML = html;
+}
+function openStats(){ openModal("stats"); renderStats(); }
+
+// —— 设置面板 ——
+let clearArmed = false;
+function renderSettings(){
+  let html = modalHeader("设置");
+  html += '<p class="dim" style="font-size:12.5px">存档保存在本浏览器 localStorage 中。可导出备份或迁移到其他设备。</p>';
+  html += '<button class="btn" style="width:100%;margin-top:8px" id="btn-export">导出存档</button>';
+  html += '<textarea class="save-io" id="io-box" placeholder="导出的存档会显示在这里；导入时把存档码粘贴到此处后点导入"></textarea>';
+  html += '<button class="btn" style="width:100%;margin-top:6px" id="btn-import">导入存档</button>';
+  html += '<button class="btn warn" style="width:100%;margin-top:14px" id="btn-clear">清除存档</button>';
+  html += '<p class="muted-note" id="set-msg"></p>';
+  modal.innerHTML = html;
+  clearArmed = false;
+
+  $("btn-export").addEventListener("click", ()=>{
+    save();
+    $("io-box").value = encode(JSON.stringify({ v:CONFIG.saveVersion, s:state }));
+    $("set-msg").textContent = "已导出，复制上方文本即可备份。";
+  });
+  $("btn-import").addEventListener("click", ()=>{
+    const txt = $("io-box").value;
+    if(!txt.trim()){ $("set-msg").textContent = "请先粘贴存档码。"; return; }
+    if(importSave(txt)){ $("set-msg").textContent = "导入成功！"; renderSettings(); }
+    else $("set-msg").textContent = "导入失败：存档码无效或版本不符。";
+  });
+  $("btn-clear").addEventListener("click", ()=>{
+    if(!clearArmed){
+      clearArmed = true;
+      $("btn-clear").textContent = "确定要清除吗？再点一次";
+      $("set-msg").textContent = "清除后进度不可恢复，请谨慎。";
+      return;
+    }
+    clearSave();
+    closeModal();
+  });
+}
+function openSettings(){ openModal("settings"); renderSettings(); }
+
+// —— 离线收益弹框 ——
+function showOfflineModal(sec, income){
+  let html = modalHeader("欢迎回来 🧫");
+  html += '<p>你离开了 <b>'+fmtDuration(Math.min(sec, CONFIG.offlineCapHours*3600))+'</b>'+
+    (sec > CONFIG.offlineCapHours*3600 ? '（离线收益上限 '+CONFIG.offlineCapHours+' 小时）' : '')+'。</p>';
+  html += '<p style="font-size:15px">培养皿在你不在时产出了：<br><b style="color:var(--accent);font-size:22px">+'+fmt(income)+' BM</b></p>';
+  html += '<p class="dim" style="font-size:12px">（离线效率 '+(CONFIG.offlineEfficiency*100)+'%）</p>';
+  html += '<button class="btn primary" style="width:100%;margin-top:8px" onclick="closeModal()">收下</button>';
+  modal.innerHTML = html;
+  openModal("offline");
+}
+
+/* =========================================================================
+   培养皿渲染
+   ========================================================================= */
+const canvas = $("dish");
+const ctx = canvas.getContext("2d");
+let W = 0, H = 0, dpr = 1;
+let dishCx = 0, dishCy = 0, dishR = 0, cellBaseR = 6;
+
+let cells = [];       // 粒子对象池
+let densityBoost = 0; // 超过渲染上限后的密度感
+let ripples = [];     // 点击涟漪
+let floaters = [];    // +X BM 飘字
+
+function resizeCanvas(){
+  const rect = canvas.getBoundingClientRect();
+  dpr = Math.min(2, window.devicePixelRatio || 1);
+  const cssW = Math.max(200, rect.width);
+  W = Math.round(cssW * dpr);
+  H = W; // 正方形
+  canvas.width = W;
+  canvas.height = H;
+  dishCx = W/2; dishCy = H/2;
+  dishR = W * 0.44;
+  cellBaseR = W * 0.028;
+}
+
+function makeCell(type){
+  const a = Math.random()*Math.PI*2;
+  const rad = Math.sqrt(Math.random()) * dishR * 0.82;
+  const c = {
+    type, x: dishCx+Math.cos(a)*rad, y: dishCy+Math.sin(a)*rad,
+    vx:0, vy:0, ang: Math.random()*Math.PI*2, va:(Math.random()-0.5)*0.03,
+    phase: Math.random()*Math.PI*2, size: 0.8+Math.random()*0.5,
+  };
+  if(type===2){ c.spikes=[]; for(let k=0;k<10;k++) c.spikes.push(0.55+Math.random()*0.55); }
+  if(type===4){ c.dend=[]; const n=3+((Math.random()*2)|0); for(let k=0;k<n;k++) c.dend.push(Math.random()*Math.PI*2); }
+  if(type===6){ c.cluster=[]; const n=4+((Math.random()*3)|0); for(let k=0;k<n;k++) c.cluster.push({dx:(Math.random()-0.5),dy:(Math.random()-0.5),r:0.32+Math.random()*0.3}); }
+  return c;
+}
+
+// 依据持有数量调整渲染实体（在购买/传代/读档时调用，不每帧执行）
+function reconcileCells(){
+  const totalOwned = state.owned.reduce((a,b)=>a+b,0);
+  if(totalOwned <= 0){ cells.length = 0; densityBoost = 0; return; }
+  const cap = CONFIG.renderCap;
+  const totalTarget = Math.min(cap, totalOwned);
+  densityBoost = totalOwned > cap ? Math.min(0.5, (totalOwned - cap)/(cap*6)) : 0;
+
+  const want = [];
+  let sum = 0;
+  for(let i=0;i<8;i++){
+    const w = state.owned[i] > 0 ? Math.max(1, Math.round(totalTarget * state.owned[i]/totalOwned)) : 0;
+    want.push(w); sum += w;
+  }
+  while(sum > cap){ let mi=0; for(let i=1;i<8;i++) if(want[i]>want[mi]) mi=i; if(want[mi]<=0) break; want[mi]--; sum--; }
+
+  for(let i=0;i<8;i++){
+    let cur = cells.filter(c=>c.type===i).length;
+    while(cur < want[i]){ cells.push(makeCell(i)); cur++; }
+    while(cur > want[i]){ const idx=cells.findIndex(c=>c.type===i); if(idx<0)break; cells.splice(idx,1); cur--; }
+  }
+}
+
+function updateCells(){
+  const lim = dishR * 0.86;
+  for(const c of cells){
+    c.vx += (Math.random()-0.5)*0.12*(W/500);
+    c.vy += (Math.random()-0.5)*0.12*(W/500);
+    c.vx *= 0.90; c.vy *= 0.90;
+    c.x += c.vx; c.y += c.vy; c.ang += c.va;
+    const dx=c.x-dishCx, dy=c.y-dishCy, d=Math.hypot(dx,dy);
+    if(d > lim){ const k=lim/d; c.x=dishCx+dx*k; c.y=dishCy+dy*k; c.vx*=-0.4; c.vy*=-0.4; }
+  }
+}
+
+/* —— 各品系细胞形状（也用于列表图标，ctx 可为任意画布） —— */
+function drawCellShape(g, x, y, R, type, ang, t, alpha){
+  const col = CELL_COLORS[type];
+  g.save();
+  g.translate(x, y);
+  g.globalAlpha = alpha;
+  g.rotate(ang);
+  g.fillStyle = col;
+  g.strokeStyle = col;
+  switch(type){
+    case 0: { // 大肠杆菌：胶囊
+      const w=R*1.9, h=R*0.9;
+      g.beginPath();
+      if(g.roundRect) g.roundRect(-w/2,-h/2,w,h,h/2);
+      else { g.arc(-w/2+h/2,0,h/2,Math.PI/2,-Math.PI/2); g.lineTo(w/2-h/2,-h/2); g.arc(w/2-h/2,0,h/2,-Math.PI/2,Math.PI/2); g.closePath(); }
+      g.fill();
+      break;
+    }
+    case 1: { // 酵母：椭圆 + 出芽
+      g.beginPath(); g.ellipse(0,0,R*0.95,R*0.7,0,0,Math.PI*2); g.fill();
+      g.beginPath(); g.arc(R*0.85,-R*0.5,R*0.42,0,Math.PI*2); g.fill();
+      break;
+    }
+    case 2: { // 成纤维：不规则星
+      g.beginPath();
+      for(let k=0;k<10;k++){
+        const aa=k/10*Math.PI*2, rr=R*(k%2? 0.5 : 1.0)*(0.7+0.5*Math.sin(aa*2));
+        const px=Math.cos(aa)*rr, py=Math.sin(aa)*rr;
+        k===0?g.moveTo(px,py):g.lineTo(px,py);
+      }
+      g.closePath(); g.fill();
+      break;
+    }
+    case 3: { // 干细胞：带光晕圆
+      g.shadowColor=col; g.shadowBlur=R*1.2;
+      g.beginPath(); g.arc(0,0,R*0.8,0,Math.PI*2); g.fill();
+      g.shadowBlur=0;
+      g.globalAlpha=alpha*0.4; g.beginPath(); g.arc(0,0,R*1.15,0,Math.PI*2); g.stroke();
+      break;
+    }
+    case 4: { // 神经元：树突分叉
+      g.lineWidth=Math.max(1,R*0.18); g.globalAlpha=alpha*0.9;
+      const n=4;
+      for(let k=0;k<n;k++){
+        const aa=k/n*Math.PI*2 + 0.3*Math.sin(t+k);
+        g.beginPath(); g.moveTo(0,0);
+        const ex=Math.cos(aa)*R*1.3, ey=Math.sin(aa)*R*1.3;
+        g.lineTo(ex,ey);
+        g.moveTo(ex,ey); g.lineTo(ex+Math.cos(aa+0.5)*R*0.5, ey+Math.sin(aa+0.5)*R*0.5);
+        g.moveTo(ex,ey); g.lineTo(ex+Math.cos(aa-0.5)*R*0.5, ey+Math.sin(aa-0.5)*R*0.5);
+        g.stroke();
+      }
+      g.globalAlpha=alpha; g.beginPath(); g.arc(0,0,R*0.45,0,Math.PI*2); g.fill();
+      break;
+    }
+    case 5: { // 心肌：节律性脉动方圆
+      const pulse = 1 + 0.16*Math.sin(t*3);
+      const s=R*0.95*pulse;
+      g.beginPath();
+      if(g.roundRect) g.roundRect(-s,-s,s*2,s*2,s*0.5);
+      else g.rect(-s,-s,s*2,s*2);
+      g.fill();
+      break;
+    }
+    case 6: { // 类器官：聚团小圆
+      const pts=[[0,0,0.55],[0.7,0.2,0.42],[-0.5,0.5,0.4],[0.3,-0.6,0.38],[-0.6,-0.3,0.35]];
+      for(const p of pts){ g.beginPath(); g.arc(p[0]*R,p[1]*R,p[2]*R,0,Math.PI*2); g.fill(); }
+      break;
+    }
+    case 7: { // 合成细胞：六边形
+      g.beginPath();
+      for(let k=0;k<6;k++){ const aa=k/6*Math.PI*2, px=Math.cos(aa)*R, py=Math.sin(aa)*R; k===0?g.moveTo(px,py):g.lineTo(px,py); }
+      g.closePath(); g.fill();
+      g.globalAlpha=alpha*0.5; g.lineWidth=Math.max(1,R*0.12);
+      g.strokeStyle="#0a0e14"; g.beginPath();
+      for(let k=0;k<6;k++){ const aa=k/6*Math.PI*2, px=Math.cos(aa)*R*0.5, py=Math.sin(aa)*R*0.5; k===0?g.moveTo(px,py):g.lineTo(px,py); }
+      g.closePath(); g.stroke();
+      break;
+    }
+  }
+  g.restore();
+}
+
+function drawDish(){
+  ctx.clearRect(0,0,W,H);
+  // 玻璃质感径向渐变
+  const grd = ctx.createRadialGradient(dishCx, dishCy*0.9, dishR*0.1, dishCx, dishCy, dishR);
+  grd.addColorStop(0,   "rgba(34,52,60,0.55)");
+  grd.addColorStop(0.7, "rgba(20,32,42,0.5)");
+  grd.addColorStop(1,   "rgba(10,16,24,0.15)");
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(dishCx, dishCy, dishR, 0, Math.PI*2); ctx.fill();
+  // 外圈
+  ctx.lineWidth = Math.max(2, dishR*0.03);
+  ctx.strokeStyle = "rgba(61,220,151,0.22)";
+  ctx.beginPath(); ctx.arc(dishCx, dishCy, dishR, 0, Math.PI*2); ctx.stroke();
+  // 玻璃高光
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "rgba(200,230,240,0.07)";
+  ctx.beginPath(); ctx.arc(dishCx, dishCy, dishR*0.9, 0, Math.PI*2); ctx.stroke();
+  ctx.strokeStyle = "rgba(255,255,255,0.05)";
+  ctx.beginPath(); ctx.arc(dishCx - dishR*0.25, dishCy - dishR*0.3, dishR*0.5, Math.PI*0.9, Math.PI*1.5); ctx.stroke();
+}
+
+function render(){
+  const t = performance.now()/1000;
+  drawDish();
+  // 细胞
+  for(const c of cells){
+    const R = cellBaseR * c.size;
+    drawCellShape(ctx, c.x, c.y, R, c.type, c.ang, t + c.phase, 0.82 + densityBoost*0.18);
+  }
+  // 涟漪
+  for(let i=ripples.length-1;i>=0;i--){
+    const r = ripples[i];
+    r.life -= 0.03; r.r += r.vr;
+    if(r.life <= 0){ ripples.splice(i,1); continue; }
+    ctx.globalAlpha = r.life*0.6;
+    ctx.strokeStyle = "#3ddc97"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, Math.PI*2); ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  // 飘字
+  ctx.textAlign = "center";
+  ctx.font = "600 " + Math.round(cellBaseR*2.4) + "px -apple-system,'Segoe UI',sans-serif";
+  for(let i=floaters.length-1;i>=0;i--){
+    const f = floaters[i];
+    f.life -= 0.018; f.y -= 0.9*dpr;
+    if(f.life <= 0){ floaters.splice(i,1); continue; }
+    ctx.globalAlpha = Math.min(1, f.life*1.5);
+    ctx.fillStyle = "#7dffcf";
+    ctx.fillText(f.text, f.x, f.y);
+    ctx.globalAlpha = 1;
+  }
+}
+
+/* —— 点击培养皿 —— */
+function onDishPointer(clientX, clientY){
+  const rect = canvas.getBoundingClientRect();
+  const x = (clientX - rect.left) / rect.width * W;
+  const y = (clientY - rect.top) / rect.height * H;
+  const gain = clickGain();
+  state.bm += gain;
+  state.runEarned += gain;
+  state.totalEarned += gain;
+  state.totalClicks++;
+  checkAchievements();
+  ripples.push({ x, y, r: cellBaseR, vr: dishR*0.02, life: 1 });
+  floaters.push({ x, y: y - cellBaseR, text: "+" + fmt(gain), life: 1 });
+  if(floaters.length > 24) floaters.shift();
+  refreshUI();
+}
+canvas.addEventListener("pointerdown", (e)=>{ e.preventDefault(); onDishPointer(e.clientX, e.clientY); });
+
+/* =========================================================================
+   主循环
+   ========================================================================= */
+function frame(){
+  processTime();
+  if(!document.hidden){
+    updateCells();
+    render();
+  }
+  requestAnimationFrame(frame);
+}
+
+// UI 文本刷新（10fps 足够，避免每帧动 DOM）
+setInterval(()=>{ if(!document.hidden) refreshUI(); }, 100);
+// 后台逻辑补算兜底
+setInterval(processTime, 1000);
+// 自动存档
+setInterval(save, CONFIG.autosaveMs);
+
+/* =========================================================================
+   初始化
+   ========================================================================= */
+function init(){
+  buildStrainList();
+  buildCodex();
+
+  const hadSave = load();
+  resizeCanvas();
+  reconcileCells();
+  if(hadSave) applyOffline();   // 仅在有存档时结算离线收益
+  lastLogic = Date.now();
+  logicAcc = 0;
+  refreshUI();
+
+  // 按钮
+  $("btn-upg").addEventListener("click", openUpgrades);
+  $("btn-prestige").addEventListener("click", openPrestige);
+  $("btn-stats").addEventListener("click", openStats);
+  $("btn-settings").addEventListener("click", openSettings);
+
+  // 存档时机
+  document.addEventListener("visibilitychange", ()=>{ processTime(); save(); if(!document.hidden){ lastLogic=Date.now(); } });
+  window.addEventListener("beforeunload", save);
+  window.addEventListener("resize", ()=>{ resizeCanvas(); });
+
+  requestAnimationFrame(frame);
+}
+
+// 图鉴内容
+function buildCodex(){
+  const el = $("codex");
+  el.innerHTML = CONFIG.strains.map(s=>
+    '<div class="c"><h3>'+s.name+'<em>'+s.en+'</em></h3><p>'+s.bio+'</p></div>'
+  ).join("");
+}
+
+// 暴露给内联 onclick
+window.closeModal = closeModal;
+
+init();
+</script>
+</body>
+</html>

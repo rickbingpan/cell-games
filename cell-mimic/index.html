@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Cell Mimic · 细胞拟态 —— 实验室躲猫猫游戏</title>
+<meta name="description" content="Cell Mimic 细胞拟态：一只逃出培养皿的细胞，拟态成实验器材躲避 AI 巡检者的俯视躲猫猫游戏。静止即安全、移动即风险。含拟态躲藏与巡检搜寻双模式，支持键鼠与触屏，纯前端单文件。">
+<style>
+:root{
+  --bg-deep:#0a0e14; --bg-panel:#141b24; --floor:#12202b; --floor-line:#1c2f3d;
+  --border:#1f2b38; --text:#c8d4e0; --text-dim:#6b7d8f;
+  --accent:#3ddc97; --accent-dim:#1a6b4a; --hunter:#ff5c6c; --suspect:#e8b84b; --locked:#2a3442;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;background:var(--bg-deep);color:var(--text);}
+body{font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.5;font-size:15px;-webkit-font-smoothing:antialiased;}
+h1,h2,h3{margin:0 0 .4em;font-weight:600;}
+a{color:var(--accent);}
+.wrap{max-width:1000px;margin:0 auto;padding:10px 12px 40px;}
+
+/* HUD */
+.hud{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:8px 12px;margin-bottom:10px;}
+.hud .title{font-size:16px;font-weight:700;letter-spacing:.5px;white-space:nowrap;}
+.hud .title small{color:var(--text-dim);font-weight:400;font-size:11px;margin-left:5px;}
+.hud .stats{display:flex;gap:16px;flex-wrap:wrap;align-items:baseline;}
+.hud .st{font-size:12px;color:var(--text-dim);white-space:nowrap;}
+.hud .st b{color:var(--text);font-size:15px;font-variant-numeric:tabular-nums;margin-left:3px;}
+.hud .st.time b{color:var(--accent);} .hud .st.time.low b{color:var(--hunter);}
+.hud .hbtns{display:flex;gap:6px;}
+.hbtn{background:#0f1620;border:1px solid var(--border);color:var(--text);border-radius:7px;padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit;}
+.hbtn:hover{border-color:var(--accent-dim);color:var(--accent);}
+
+/* 舞台 */
+.stage-panel{background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:8px;position:relative;}
+.stage-box{position:relative;width:100%;aspect-ratio:960/600;max-height:70vh;margin:0 auto;}
+canvas#game{width:100%;height:100%;display:block;border-radius:8px;background:#0b141c;touch-action:none;cursor:pointer;}
+/* 警戒条 */
+.alert-wrap{height:8px;background:#0d1620;border-radius:4px;margin-top:8px;overflow:hidden;border:1px solid var(--border);}
+.alert-bar{height:100%;width:0;background:linear-gradient(90deg,var(--suspect),var(--hunter));transition:width .08s linear;}
+.stage-hint{text-align:center;color:var(--text-dim);font-size:12px;margin-top:6px;min-height:16px;}
+.stage-hint b{color:var(--accent);}
+
+/* 触屏拟态按钮 */
+.touch-btn{position:absolute;bottom:16px;right:16px;width:74px;height:74px;border-radius:50%;
+  background:rgba(61,220,151,.14);border:2px solid var(--accent);color:var(--accent);
+  font-size:13px;font-weight:700;display:none;align-items:center;justify-content:center;user-select:none;z-index:5;touch-action:none;}
+.touch-btn:active{background:rgba(61,220,151,.3);}
+body.touch .touch-btn.showbtn{display:flex;}
+
+/* 广告位 */
+.ad-region{border-top:1px solid var(--border);margin-top:18px;padding-top:6px;text-align:center;}
+.ad-label{font-size:11px;color:var(--text-dim);letter-spacing:2px;}
+.ad-slot{margin:6px auto 0;width:728px;height:90px;max-width:100%;background:#0d131b;border:1px dashed var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#3a4756;font-size:12px;}
+@media(max-width:900px){.ad-slot{width:320px;height:100px;}}
+
+/* 内容 */
+.content{margin-top:24px;}
+.content section{background:var(--bg-panel);border:1px solid var(--border);border-radius:10px;padding:15px 18px;margin-bottom:14px;}
+.content h2{font-size:17px;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px;}
+.content p{margin:.5em 0;}
+.content .dim{color:var(--text-dim);}
+.content kbd{background:#0f1620;border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:12px;color:var(--accent);}
+.codex{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;}
+.codex .c{background:#0f1620;border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;gap:10px;align-items:center;}
+.codex .c canvas{width:44px;height:44px;flex:0 0 44px;background:#0b141c;border-radius:6px;}
+.codex .c .t{font-size:13.5px;font-weight:600;}
+.codex .c .d{font-size:12px;color:var(--text-dim);}
+.tips li,.changelog li{color:var(--text-dim);font-size:13px;margin-bottom:5px;}
+footer{text-align:center;color:var(--text-dim);font-size:12px;margin-top:22px;}
+
+/* 模态 / 菜单 */
+.overlay{position:absolute;inset:8px;border-radius:8px;background:rgba(6,10,15,.86);backdrop-filter:blur(2px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:10;padding:20px;}
+.overlay.show{display:flex;}
+.overlay h2{font-size:24px;margin-bottom:6px;}
+.overlay h2.win{color:var(--accent);} .overlay h2.lose{color:var(--hunter);}
+.overlay p{color:var(--text-dim);font-size:14px;margin:2px 0;}
+.overlay .big{font-size:15px;color:var(--text);margin:8px 0;}
+.mode-cards{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin:14px 0;}
+.mode-card{width:210px;max-width:80vw;background:#0f1720;border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:.14s;text-align:left;}
+.mode-card:hover{border-color:var(--accent);background:rgba(61,220,151,.05);transform:translateY(-2px);}
+.mode-card h3{font-size:16px;margin-bottom:4px;}
+.mode-card .em{color:var(--text-dim);font-size:12.5px;min-height:34px;}
+.mode-card .best{color:var(--suspect);font-size:12px;margin-top:8px;}
+.mode-card .cont{margin-top:6px;font-size:12px;color:var(--accent);}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;}
+.gbtn{background:var(--accent-dim);border:1px solid var(--accent);color:#eafff6;border-radius:8px;padding:10px 20px;font-size:14px;cursor:pointer;font-family:inherit;}
+.gbtn:hover{background:#238a60;}
+.gbtn.sec{background:#0f1620;border-color:var(--border);color:var(--text);}
+.gbtn.sec:hover{border-color:var(--accent-dim);color:var(--accent);}
+.small-link{color:var(--text-dim);font-size:12px;cursor:pointer;margin-top:14px;text-decoration:underline;}
+.set-row{display:flex;align-items:center;gap:8px;justify-content:center;margin:8px 0;font-size:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HUD -->
+  <header class="hud">
+    <div class="title">Cell Mimic <small>细胞拟态</small></div>
+    <div class="stats">
+      <span class="st">模式<b id="ui-mode">—</b></span>
+      <span class="st">关卡<b id="ui-level">1</b></span>
+      <span class="st time" id="ui-time-wrap">时间<b id="ui-time">0</b></span>
+      <span class="st">得分<b id="ui-score">0</b></span>
+      <span class="st">最高<b id="ui-best">0</b></span>
+    </div>
+    <div class="hbtns">
+      <button class="hbtn" id="btn-pause">暂停</button>
+      <button class="hbtn" id="btn-menu">菜单</button>
+    </div>
+  </header>
+
+  <!-- 舞台 -->
+  <div class="stage-panel">
+    <div class="stage-box">
+      <canvas id="game" width="960" height="600" aria-label="细胞拟态游戏舞台"></canvas>
+      <div class="touch-btn" id="touch-disguise">拟态</div>
+      <div class="overlay" id="overlay"></div>
+    </div>
+    <div class="alert-wrap"><div class="alert-bar" id="alert-bar"></div></div>
+    <div class="stage-hint" id="hint"></div>
+  </div>
+
+  <!-- 广告位 -->
+  <div class="ad-region">
+    <div class="ad-label">广告</div>
+    <div class="ad-slot" id="ad-bottom"><!-- AdSense 代码后续插入此处 -->广告位</div>
+  </div>
+
+  <!-- 内容 -->
+  <div class="content">
+    <section>
+      <h1 style="font-size:20px;color:var(--text)">Cell Mimic · 细胞拟态</h1>
+      <h2>玩法说明</h2>
+      <p>一只从培养皿逃出来的细胞，闯进了堆满器材的实验台。为了不被<strong style="color:var(--hunter)">巡检者</strong>清理掉，它学会了一手绝活——<strong>拟态</strong>成周围的实验器材，混在同类里一动不动。</p>
+      <p>全部乐趣来自一对矛盾：<strong style="color:var(--accent)">静止即安全，移动即风险。</strong>拟态后静止不动，你就是一件普通器材；可一旦在巡检者的<strong>视野扇形</strong>里移动，会动的"器材"立刻引起怀疑，它会走过来验货。被逮到就出局。</p>
+      <p>游戏有两种模式：<strong>拟态躲藏</strong>——你是躲藏者，撑过计时器就过关，逐关越来越难；<strong>巡检搜寻</strong>——换你当找手，从一堆器材里揪出伪装的细胞。</p>
+    </section>
+    <section>
+      <h2>操作说明</h2>
+      <p>· <strong>桌面（拟态躲藏）</strong>：<kbd>W A S D</kbd> 或 <kbd>方向键</kbd> 移动，<kbd>空格</kbd> 拟态/解除，<kbd>Esc</kbd> 暂停。</p>
+      <p>· <strong>移动端（拟态躲藏）</strong>：在舞台左侧按住拖动出<strong>虚拟摇杆</strong>移动，右下角<strong>拟态按钮</strong>变身。</p>
+      <p>· <strong>巡检搜寻（双端）</strong>：鼠标点击 / 手指点按器材即可"验货"。</p>
+      <p class="dim">提示：靠近器材才能拟态成它；拟态后尽量贴着同类器材群静止，最安全。</p>
+    </section>
+    <section>
+      <h2>器材图鉴</h2>
+      <div class="codex" id="codex"></div>
+    </section>
+    <section>
+      <h2>攻略提示</h2>
+      <ul class="tips">
+        <li>被看到移动后别原地不动——巡检者会走到"可疑点"验货，你要趁它举手预备的 0.6 秒逃出视野再重新拟态。</li>
+        <li>贴着同类器材扎堆的地方拟态，验货很难精确命中你。</li>
+        <li>酒精灯的火苗一直在晃，是天然掩护：巡检者只对"整体位移"起疑，不会因内置动画怀疑你。</li>
+        <li>巡检搜寻模式里，偷偷抖动/挪位的那件器材，多半就是伪装的细胞。</li>
+      </ul>
+    </section>
+    <section>
+      <h2>世界观</h2>
+      <p class="dim">Cell Mimic 与 <strong>Cell Dodge</strong>（弹幕闪避）、<strong>Cell Culture</strong>（细胞培养）同属一个细胞宇宙——这只主角，正是从 Cell Culture 的培养皿里溜出来的那一株。</p>
+    </section>
+    <section>
+      <h2>更新日志</h2>
+      <ul class="changelog">
+        <li><b>v1.0.0</b> · 2026-07-20 · 首发：拟态躲藏、巡检搜寻双模式，三态巡检 AI 与视野系统，逐关难度、本地最高分与关卡进度。</li>
+      </ul>
+    </section>
+  </div>
+  <footer>Cell Mimic · 纯前端单文件躲猫猫 · 无外部依赖 · 数据仅存于你的浏览器</footer>
+</div>
+
+<script>
+"use strict";
+/* =========================================================================
+   Cell Mimic —— 单文件实验室拟态躲猫猫
+   可调数值集中在 CONFIG。逻辑坐标基于 960×600 舞台，画布等比缩放(contain)。
+   ========================================================================= */
+
+/* ------------------------------------------------------------------ CONFIG */
+const CONFIG = {
+  saveKey:"cellMimic_save_v1", saveVersion:1,
+  stage:{ w:960, h:600 },
+
+  player:{ radius:15, speed:170, disguiseTime:0.32, disguiseRange:78 },
+
+  hunter:{
+    radius:17, visionRange:230, visionHalfAngle:32*Math.PI/180,
+    patrolSpeed:96, chaseSpeed:178, chaseLoseSec:2.5,
+    inspectWindup:0.6, inspectDist:46, catchRadius:36,
+  },
+  susp:{ fastRate:150, moveRate:95, decayRate:60, inspectThreshold:100 },
+
+  roundA:{ baseTime:75, timePerLevel:5 },
+  roundB:{ baseTime:60, wrongPenalty:4 },
+
+  // 器材：名称/英文/颜色/科普
+  props:[
+    { name:"培养皿",  en:"Petri Dish",   col:"#7fb0c9", bio:"浅圆盘，用于培养微生物菌落，是实验室最常见的容器。" },
+    { name:"试管",    en:"Test Tube",    col:"#6fd0c4", bio:"细长玻璃管，用于盛放、混合与加热少量液体样本。" },
+    { name:"烧杯",    en:"Beaker",       col:"#9ab0e0", bio:"带刻度的广口杯，用于配制溶液与粗略量取液体。" },
+    { name:"离心管",  en:"Centrifuge",   col:"#c9a0e0", bio:"尖底小管，配合离心机按密度分离样本中的组分。" },
+    { name:"酒精灯",  en:"Alcohol Lamp", col:"#e0b57f", bio:"以酒精为燃料的小灯，用于加热与灼烧灭菌。" },
+    { name:"菌落瓶",  en:"Culture Flask",col:"#86d69a", bio:"圆肚窄颈的培养瓶，用于液体培养基中扩增细胞。" },
+  ],
+};
+
+/* ------------------------------------------------------------------ 存档 */
+function freshSave(){ return { v:CONFIG.saveVersion, bestA:0, bestB:0, maxLevelA:1, maxLevelB:1, sound:true, plays:0 }; }
+let SAVE = freshSave();
+function loadSave(){
+  try{
+    const raw = localStorage.getItem(CONFIG.saveKey);
+    if(!raw) return;
+    const d = JSON.parse(decodeURIComponent(escape(atob(raw))));
+    if(d && d.v === CONFIG.saveVersion) SAVE = Object.assign(freshSave(), d);
+    else console.warn("[CellMimic] 存档版本不符，回退默认。");
+  }catch(e){ console.warn("[CellMimic] 读档失败，回退默认。", e); }
+}
+function writeSave(){
+  try{ localStorage.setItem(CONFIG.saveKey, btoa(unescape(encodeURIComponent(JSON.stringify(SAVE))))); }catch(e){}
+}
+
+/* ------------------------------------------------------------------ 音效(WebAudio 合成) */
+let AC=null;
+function actx(){ if(!AC){ try{ AC = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return AC; }
+function beep(freq, dur, type, gain, slideTo){
+  if(!SAVE.sound) return;
+  const c=actx(); if(!c) return;
+  if(c.state==="suspended") c.resume();
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type||"sine"; o.frequency.value=freq;
+  if(slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, c.currentTime+dur);
+  g.gain.setValueAtTime(gain||0.15, c.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime+dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(); o.stop(c.currentTime+dur);
+}
+const sfx={
+  disguise:()=>beep(520,0.14,"sine",0.18,900),
+  undisguise:()=>beep(400,0.12,"sine",0.14,220),
+  alert:()=>beep(880,0.18,"square",0.12,660),
+  inspect:()=>beep(240,0.1,"sawtooth",0.14),
+  catch:()=>{beep(200,0.4,"sawtooth",0.2,80);},
+  win:()=>{beep(523,0.12,"sine",0.18);setTimeout(()=>beep(659,0.12,"sine",0.18),120);setTimeout(()=>beep(784,0.2,"sine",0.2),240);},
+  lose:()=>{beep(392,0.18,"triangle",0.18,196);setTimeout(()=>beep(262,0.3,"triangle",0.18,130),160);},
+  found:()=>beep(700,0.12,"sine",0.16,1000),
+  wrong:()=>beep(160,0.16,"square",0.14),
+};
+
+/* ------------------------------------------------------------------ 工具 */
+const rand=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const dist=(ax,ay,bx,by)=>Math.hypot(ax-bx,ay-by);
+function angleDiff(a,b){ let d=a-b; while(d>Math.PI)d-=Math.PI*2; while(d<-Math.PI)d+=Math.PI*2; return d; }
+function rectCircle(rx,ry,rw,rh,cx,cy,cr){
+  const nx=clamp(cx,rx,rx+rw), ny=clamp(cy,ry,ry+rh);
+  return dist(nx,ny,cx,cy) < cr;
+}
+// 线段是否穿过矩形(用于视线遮挡，采样法)
+function segBlocked(x1,y1,x2,y2,walls){
+  const steps=14;
+  for(let i=1;i<steps;i++){
+    const t=i/steps, x=x1+(x2-x1)*t, y=y1+(y2-y1)*t;
+    for(const w of walls){ if(x>=w.x&&x<=w.x+w.w&&y>=w.y&&y<=w.y+w.h) return true; }
+  }
+  return false;
+}
+
+/* =========================================================================
+   游戏状态
+   ========================================================================= */
+const ST = CONFIG.stage;
+let game = null;         // 当前对局数据
+let screen = "menu";     // menu | playing | paused | over
+let hintTimer = 0;
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+let W = canvas.width, H = canvas.height;
+let view = { scale:1, ox:0, oy:0 };
+
+function computeView(){
+  const scale = Math.min(W/ST.w, H/ST.h);
+  view.scale = scale; view.ox = (W-ST.w*scale)/2; view.oy = (H-ST.h*scale)/2;
+}
+function screenToStage(clientX, clientY){
+  const r = canvas.getBoundingClientRect();
+  const cx = (clientX-r.left)*(W/r.width), cy = (clientY-r.top)*(H/r.height);
+  return { x:(cx-view.ox)/view.scale, y:(cy-view.oy)/view.scale };
+}
+
+/* ------------------------------------------------------------------ 关卡生成 */
+function makeWalls(){
+  // 实验台(遮挡+阻挡)
+  return [
+    { x:360, y:120, w:240, h:56 },
+    { x:170, y:390, w:190, h:58 },
+    { x:640, y:360, w:180, h:64 },
+  ];
+}
+function farFromWalls(x,y,walls,pad){
+  for(const w of walls){ if(x>w.x-pad&&x<w.x+w.w+pad&&y>w.y-pad&&y<w.y+w.h+pad) return false; }
+  return true;
+}
+// 若点落在墙内/附近，向舞台中心方向推到空地
+function nudgeClear(pt,walls,pad){
+  let {x,y}=pt;
+  for(let t=0;t<40 && !farFromWalls(x,y,walls,pad);t++){
+    x+=(x<ST.w/2?-1:1)*10; y+=(y<ST.h/2?-1:1)*8;
+    x=clamp(x,pad,ST.w-pad); y=clamp(y,pad,ST.h-pad);
+  }
+  return {x,y};
+}
+function makeProps(walls, count){
+  const props=[]; let tries=0;
+  while(props.length<count && tries<count*40){
+    tries++;
+    const type=(Math.random()*CONFIG.props.length)|0;
+    const x=rand(60, ST.w-60), y=rand(60, ST.h-60);
+    if(!farFromWalls(x,y,walls,34)) continue;
+    if(props.some(p=>dist(p.x,p.y,x,y)<44)) continue;
+    props.push({ type, x, y, phase:rand(0,Math.PI*2), hider:false, jig:0, jigTimer:rand(1,4), ox:0, oy:0, gone:false });
+  }
+  return props;
+}
+function makeHunter(x,y){
+  return { x,y, angle:rand(0,Math.PI*2), state:"patrol", susp:0,
+    wp:{x,y}, windup:0, chaseLost:0, lastKnown:null, callTimer:0 };
+}
+
+function startGame(mode, level){
+  const walls = makeWalls();
+  computeView();
+  if(mode==="A"){
+    const hunterCount = Math.min(3, 1+Math.floor((level-1)/3));
+    const vScale = 1+0.05*(level-1), sScale = 1+0.04*(level-1);
+    const props = makeProps(walls, 30 + level*2);
+    const hunters=[];
+    const spots=[{x:480,y:250},{x:120,y:120},{x:840,y:220}];
+    for(let i=0;i<hunterCount;i++){ const s=nudgeClear(spots[i],walls,CONFIG.hunter.radius+6); const h=makeHunter(s.x,s.y);
+      h.visionRange=CONFIG.hunter.visionRange*vScale; h.patrolSpeed=CONFIG.hunter.patrolSpeed*sScale;
+      pickWaypoint(h,walls); hunters.push(h); }
+    game={ mode, level, walls, props, hunters,
+      player:{ x:60, y:ST.h-60, vx:0, vy:0, disguised:false, disguiseType:0, morph:0, squash:0, moving:false, eyeDir:0 },
+      timeLeft: CONFIG.roundA.baseTime + CONFIG.roundA.timePerLevel*(level-1),
+      score:0, alert:0, escapes:0, particles:[] };
+  } else {
+    const total = (3+Math.floor(level/2)) + 12;
+    const props = makeProps(walls, total);
+    const hiderN = 3+Math.floor(level/2);
+    const idx=[...props.keys()]; for(let i=idx.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[idx[i],idx[j]]=[idx[j],idx[i]];}
+    const moveChance = Math.pow(0.9, level);
+    for(let k=0;k<hiderN;k++){ props[idx[k]].hider=true; props[idx[k]].moveChance=moveChance; }
+    game={ mode, level, walls, props, hunters:[],
+      reticle:{x:ST.w/2,y:ST.h/2}, hiderTotal:hiderN, found:0,
+      timeLeft: CONFIG.roundB.baseTime, score:0, alert:0, particles:[] };
+  }
+  screen="playing";
+  hideOverlay();
+  updateHUD();
+  showHint(mode==="A" ? "靠近器材按 空格/拟态按钮 变身，静止别被看见移动" : "点击你觉得可疑（会动）的器材来验货", 3.5);
+}
+
+function pickWaypoint(h, walls){
+  for(let t=0;t<30;t++){ const x=rand(50,ST.w-50), y=rand(50,ST.h-50);
+    if(farFromWalls(x,y,walls,30)){ h.wp={x,y}; return; } }
+  h.wp={x:ST.w/2,y:ST.h/2};
+}
+
+/* =========================================================================
+   输入
+   ========================================================================= */
+const keys={};
+let joy={ active:false, ox:0, oy:0, x:0, y:0, dx:0, dy:0 };
+let disguiseQueued=false;
+
+addEventListener("keydown",e=>{
+  if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key)) e.preventDefault();
+  keys[e.key.toLowerCase()]=true;
+  if(e.key===" ") disguiseQueued=true;
+  if(e.key==="Escape") togglePause();
+});
+addEventListener("keyup",e=>{ keys[e.key.toLowerCase()]=false; });
+
+// 指针：模式A左侧摇杆 / 模式B点击验货
+canvas.addEventListener("pointerdown",e=>{
+  e.preventDefault();
+  if(screen!=="playing") return;
+  const p=screenToStage(e.clientX,e.clientY);
+  if(game.mode==="B"){ inspectAt(p.x,p.y); return; }
+  // 模式A：起摇杆
+  joy.active=true; joy.id=e.pointerId; joy.ox=p.x; joy.oy=p.y; joy.x=p.x; joy.y=p.y; joy.dx=0; joy.dy=0;
+});
+canvas.addEventListener("pointermove",e=>{
+  if(game && game.mode==="B" && screen==="playing"){ const p=screenToStage(e.clientX,e.clientY); game.reticle.x=p.x; game.reticle.y=p.y; }
+  if(joy.active && e.pointerId===joy.id){ const p=screenToStage(e.clientX,e.clientY); joy.x=p.x; joy.y=p.y;
+    let dx=joy.x-joy.ox, dy=joy.y-joy.oy; const m=Math.hypot(dx,dy)||1, R=70;
+    const cl=Math.min(m,R)/R; joy.dx=dx/m*cl; joy.dy=dy/m*cl; }
+});
+function endJoy(e){ if(joy.active && (e.pointerId===joy.id||e.type==="pointercancel")){ joy.active=false; joy.dx=0; joy.dy=0; } }
+canvas.addEventListener("pointerup",endJoy);
+canvas.addEventListener("pointercancel",endJoy);
+
+// 触屏拟态按钮
+const tbtn=document.getElementById("touch-disguise");
+["pointerdown"].forEach(ev=>tbtn.addEventListener(ev,e=>{ e.preventDefault(); e.stopPropagation(); disguiseQueued=true; }));
+if(("ontouchstart" in window)||navigator.maxTouchPoints>0) document.body.classList.add("touch");
+
+/* =========================================================================
+   更新
+   ========================================================================= */
+function update(dt){
+  if(screen!=="playing") return;
+  game.timeLeft -= dt;
+  if(game.timeLeft<=0){ game.timeLeft=0; return endRound(game.mode==="A"); } // A:存活到底=胜；B:超时=负
+  // 器材内置动画 & 躲藏者(B)抖动
+  for(const p of game.props){
+    p.phase += dt;
+    if(p.jig>0){ p.jig-=dt; p.ox=Math.sin(p.jig*40)*3; p.oy=Math.cos(p.jig*30)*2; if(p.jig<=0){p.ox=0;p.oy=0;} }
+    if(game.mode==="B" && p.hider && !p.gone){ p.jigTimer-=dt;
+      if(p.jigTimer<=0){ p.jigTimer=rand(1.4,3.6); if(Math.random()<p.moveChance){ p.jig=rand(0.25,0.5); } } }
+  }
+  // 粒子
+  for(let i=game.particles.length-1;i>=0;i--){ const q=game.particles[i]; q.life-=dt; q.x+=q.vx*dt; q.y+=q.vy*dt;
+    if(q.life<=0) game.particles.splice(i,1); }
+
+  if(game.mode==="A") updateModeA(dt);
+  updateHUD();
+}
+
+function updateModeA(dt){
+  const P=game.player, C=CONFIG.player;
+  // 移动输入
+  let dx=0, dy=0;
+  if(keys["w"]||keys["arrowup"]) dy-=1;
+  if(keys["s"]||keys["arrowdown"]) dy+=1;
+  if(keys["a"]||keys["arrowleft"]) dx-=1;
+  if(keys["d"]||keys["arrowright"]) dx+=1;
+  if(joy.active){ dx+=joy.dx; dy+=joy.dy; }
+  const m=Math.hypot(dx,dy);
+  if(m>1){ dx/=m; dy/=m; }
+  const sp=C.speed;
+  let nx=P.x+dx*sp*dt, ny=P.y+dy*sp*dt;
+  nx=clamp(nx,C.radius,ST.w-C.radius); ny=clamp(ny,C.radius,ST.h-C.radius);
+  // 墙碰撞
+  for(const w of game.walls){ if(rectCircle(w.x,w.y,w.w,w.h,nx,P.y,C.radius)) nx=P.x; }
+  for(const w of game.walls){ if(rectCircle(w.x,w.y,w.w,w.h,nx,ny,C.radius)) ny=P.y; }
+  P.moving = (Math.abs(nx-P.x)+Math.abs(ny-P.y))>0.4;
+  P.speedNow = dist(P.x,P.y,nx,ny)/Math.max(dt,0.001);
+  P.x=nx; P.y=ny;
+  if(dx||dy) P.eyeDir=Math.atan2(dy,dx);
+  P.squash += ((P.moving?0.35:0)-P.squash)*Math.min(1,dt*10);
+
+  // 拟态切换
+  if(disguiseQueued){
+    disguiseQueued=false;
+    if(P.disguised){ P.disguised=false; P.morph=0; sfx.undisguise(); showHint("解除拟态",1); }
+    else{
+      // 找最近器材
+      let best=null,bd=1e9; for(const p of game.props){ const d=dist(p.x,p.y,P.x,P.y); if(d<bd){bd=d;best=p;} }
+      if(best && bd<=C.disguiseRange){ P.disguised=true; P.disguiseType=best.type; P.morph=0; sfx.disguise();
+        spawnParticles(P.x,P.y,CONFIG.props[best.type].col,10); showHint("已拟态成"+CONFIG.props[best.type].name+"，静止最安全",1.6); }
+      else showHint("靠近器材才能拟态",1.2);
+    }
+  }
+  if(P.morph<1) P.morph=Math.min(1,P.morph+dt/C.disguiseTime);
+
+  // 巡检者
+  let maxAlert=0, caught=false;
+  for(const h of game.hunters){ updateHunter(h,dt); maxAlert=Math.max(maxAlert,h.susp/CONFIG.susp.inspectThreshold); if(h.caughtPlayer) caught=true; }
+  game.alert=maxAlert;
+  if(caught){ return endRound(false); }
+}
+
+function updateHunter(h,dt){
+  const P=game.player, HC=CONFIG.hunter, S=CONFIG.susp;
+  h.caughtPlayer=false;
+  // 感知
+  const d=dist(h.x,h.y,P.x,P.y);
+  const ang=Math.atan2(P.y-h.y,P.x-h.x);
+  const inCone = d<=h.visionRange && Math.abs(angleDiff(ang,h.angle))<=HC.visionHalfAngle && !segBlocked(h.x,h.y,P.x,P.y,game.walls);
+  const disguisedStill = P.disguised && P.morph>=1 && !P.moving;
+  if(inCone){
+    if(!P.disguised){
+      if(P.moving){ // 明目张胆移动 → 立即追击
+        if(h.state!=="chase") sfx.alert();
+        h.state="chase"; h.susp=S.inspectThreshold; h.lastKnown={x:P.x,y:P.y};
+      } else { h.susp += S.fastRate*dt; h.lastKnown={x:P.x,y:P.y}; }
+    } else if(!disguisedStill){ // 拟态中移动 → 可疑
+      const sf = clamp((P.speedNow||0)/CONFIG.player.speed,0,1);
+      h.susp += S.moveRate*sf*dt; h.lastKnown={x:P.x,y:P.y};
+    }
+  } else {
+    h.susp -= S.decayRate*dt;
+  }
+  h.susp=clamp(h.susp,0,S.inspectThreshold);
+
+  // 状态机
+  if(h.state==="chase"){
+    if(inCone && !disguisedStill){ h.lastKnown={x:P.x,y:P.y}; h.chaseLost=0; }
+    else { h.chaseLost+=dt; if(h.chaseLost>HC.chaseLoseSec){ h.state="patrol"; h.susp*=0.4; pickWaypoint(h,game.walls); } }
+    const tgt=h.lastKnown||h.wp; moveHunter(h,tgt,HC.chaseSpeed,dt);
+    if(dist(h.x,h.y,P.x,P.y)<HC.catchRadius && !disguisedStill){ h.caughtPlayer=true; }
+  }
+  else if(h.state==="suspicious"){
+    const tgt=h.lastKnown||h.wp;
+    if(dist(h.x,h.y,tgt.x,tgt.y)<HC.inspectDist){
+      h.windup+=dt;
+      if(h.windup===dt||h.windup<dt*2) sfx.inspect();
+      if(h.windup>=HC.inspectWindup){ // 验货判定
+        h.windup=0;
+        if(dist(h.x,h.y,P.x,P.y)<HC.catchRadius){ h.caughtPlayer=true; }
+        else { h.state="patrol"; h.susp*=0.3; game.escapes++; pickWaypoint(h,game.walls); showHint("惊险逃脱！",1.2); }
+      }
+    } else { moveHunter(h,tgt,h.patrolSpeed*1.3,dt); h.windup=0; }
+    if(h.susp>=S.inspectThreshold && inCone && !P.disguised && P.moving){ h.state="chase"; }
+  }
+  else { // patrol
+    moveHunter(h,h.wp,h.patrolSpeed,dt);
+    if(dist(h.x,h.y,h.wp.x,h.wp.y)<24) pickWaypoint(h,game.walls);
+    if(h.susp>=S.inspectThreshold){ h.state="suspicious"; h.windup=0; sfx.alert(); }
+  }
+}
+function moveHunter(h,tgt,sp,dt){
+  const a=Math.atan2(tgt.y-h.y,tgt.x-h.x);
+  h.angle += angleDiff(a,h.angle)*Math.min(1,dt*6); // 平滑转向
+  let nx=h.x+Math.cos(a)*sp*dt, ny=h.y+Math.sin(a)*sp*dt;
+  nx=clamp(nx,HC_r(),ST.w-HC_r()); ny=clamp(ny,HC_r(),ST.h-HC_r());
+  for(const w of game.walls){ if(rectCircle(w.x,w.y,w.w,w.h,nx,h.y,CONFIG.hunter.radius)) nx=h.x; }
+  for(const w of game.walls){ if(rectCircle(w.x,w.y,w.w,w.h,nx,ny,CONFIG.hunter.radius)) ny=h.y; }
+  // 卡墙则重选航点
+  if(nx===h.x && ny===h.y && h.state==="patrol") pickWaypoint(h,game.walls);
+  h.x=nx; h.y=ny;
+}
+function HC_r(){ return CONFIG.hunter.radius; }
+
+/* 模式B：验货 */
+function inspectAt(x,y){
+  let best=null,bd=1e9; for(const p of game.props){ if(p.gone) continue; const d=dist(p.x,p.y,x,y); if(d<bd){bd=d;best=p;} }
+  if(!best || bd>42){ return; }
+  spawnParticles(best.x,best.y,"#ffffff",8);
+  if(best.hider){ best.gone=true; game.found++; game.score+=100; sfx.found(); showHint("抓到一只！("+game.found+"/"+game.hiderTotal+")",1.2);
+    if(game.found>=game.hiderTotal) return endRound(true);
+  } else { game.timeLeft-=CONFIG.roundB.wrongPenalty; game.score=Math.max(0,game.score-20); sfx.wrong(); showHint("验错了，-"+CONFIG.roundB.wrongPenalty+"秒",1); }
+  updateHUD();
+}
+
+function spawnParticles(x,y,col,n){
+  for(let i=0;i<n;i++){ const a=rand(0,Math.PI*2),s=rand(40,140); game.particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:rand(0.3,0.6),col}); }
+}
+
+/* ------------------------------------------------------------------ 回合结束 */
+function endRound(win){
+  if(screen!=="playing") return;
+  screen="over";
+  let sc=0;
+  if(game.mode==="A"){
+    const survived=(CONFIG.roundA.baseTime+CONFIG.roundA.timePerLevel*(game.level-1));
+    if(win){ sc=Math.round(survived*10 + game.timeLeft*5 + game.escapes*50 + game.level*100); }
+    else{ sc=Math.round((survived-game.timeLeft)*10 + game.escapes*50); }
+    if(win && game.level+1>SAVE.maxLevelA) SAVE.maxLevelA=game.level+1;
+    if(sc>SAVE.bestA) SAVE.bestA=sc;
+  } else {
+    if(win){ sc=Math.round(game.found*100 + game.timeLeft*8); }
+    else{ sc=game.found*100; }
+    if(win && game.level+1>SAVE.maxLevelB) SAVE.maxLevelB=game.level+1;
+    if(sc>SAVE.bestB) SAVE.bestB=sc;
+  }
+  game.finalScore=sc; SAVE.plays++; writeSave();
+  win?sfx.win():sfx.lose();
+  showOverlayResult(win, sc);
+}
+
+/* =========================================================================
+   渲染
+   ========================================================================= */
+let floorCache=null;
+function buildFloorCache(){
+  floorCache=document.createElement("canvas"); floorCache.width=ST.w; floorCache.height=ST.h;
+  const g=floorCache.getContext("2d");
+  g.fillStyle=getVar("--floor"); g.fillRect(0,0,ST.w,ST.h);
+  g.strokeStyle=getVar("--floor-line"); g.lineWidth=1;
+  for(let x=0;x<=ST.w;x+=40){ g.beginPath(); g.moveTo(x,0); g.lineTo(x,ST.h); g.stroke(); }
+  for(let y=0;y<=ST.h;y+=40){ g.beginPath(); g.moveTo(0,y); g.lineTo(ST.w,y); g.stroke(); }
+}
+function getVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+function render(){
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="#070b10"; ctx.fillRect(0,0,W,H);
+  ctx.setTransform(view.scale,0,0,view.scale,view.ox,view.oy);
+  // 地板
+  if(floorCache) ctx.drawImage(floorCache,0,0);
+  if(!game){ return; }
+  // 视野扇形(在地板之上、器材之下)
+  if(game.mode==="A"){ for(const h of game.hunters) drawVision(h); }
+  // 墙(实验台)
+  for(const w of game.walls) drawWall(w);
+  // 器材
+  for(const p of game.props){ if(p.gone) continue; drawProp(ctx,p.type,p.x+p.ox,p.y+p.oy,1,p.phase,1); }
+  // 玩家(模式A)
+  if(game.mode==="A") drawPlayer(game.player);
+  // 巡检者
+  if(game.mode==="A") for(const h of game.hunters) drawHunter(h);
+  // 粒子
+  for(const q of game.particles){ ctx.globalAlpha=clamp(q.life*2,0,1); ctx.fillStyle=q.col;
+    ctx.beginPath(); ctx.arc(q.x,q.y,3,0,Math.PI*2); ctx.fill(); }
+  ctx.globalAlpha=1;
+  // 准心(模式B)
+  if(game.mode==="B") drawReticle(game.reticle);
+  // 被发现红晕
+  if(game.mode==="A" && game.alert>0.55){
+    ctx.setTransform(1,0,0,1,0,0);
+    const a=(game.alert-0.55)/0.45;
+    const grd=ctx.createRadialGradient(W/2,H/2,H*0.3,W/2,H/2,H*0.62);
+    grd.addColorStop(0,"rgba(255,92,108,0)"); grd.addColorStop(1,"rgba(255,92,108,"+(0.35*a).toFixed(2)+")");
+    ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
+  }
+}
+
+function drawWall(w){
+  ctx.fillStyle="#0e1a24"; ctx.strokeStyle="#26384a"; ctx.lineWidth=2;
+  roundRect(ctx,w.x,w.y,w.w,w.h,8); ctx.fill(); ctx.stroke();
+  ctx.fillStyle="rgba(61,220,151,0.06)"; roundRect(ctx,w.x+4,w.y+4,w.w-8,w.h/2,6); ctx.fill();
+}
+function drawVision(h){
+  const col = h.state==="chase"?"rgba(255,60,80,0.20)": h.state==="suspicious"?"rgba(232,184,75,0.18)":"rgba(255,92,108,0.12)";
+  ctx.fillStyle=col;
+  ctx.beginPath(); ctx.moveTo(h.x,h.y);
+  ctx.arc(h.x,h.y,h.visionRange,h.angle-CONFIG.hunter.visionHalfAngle,h.angle+CONFIG.hunter.visionHalfAngle);
+  ctx.closePath(); ctx.fill();
+}
+
+/* 玩家细胞 */
+function drawPlayer(P){
+  if(P.disguised){
+    // 拟态成器材：morph 过渡(缩放弹一下)
+    const s=0.7+0.3*P.morph;
+    drawProp(ctx,P.disguiseType,P.x,P.y,s,performance.now()/1000,1);
+    if(P.morph<1){ ctx.globalAlpha=1-P.morph; drawCell(P.x,P.y,CONFIG.player.radius,"#ffffff",P.eyeDir,P.squash); ctx.globalAlpha=1; }
+    // 移动时轻微轮廓提示(玩家自己能看出在动)
+    return;
+  }
+  drawCell(P.x,P.y,CONFIG.player.radius,"#ffffff",P.eyeDir,P.squash);
+}
+function drawCell(x,y,r,col,eyeDir,squash){
+  squash=squash||0;
+  ctx.save(); ctx.translate(x,y); ctx.rotate(eyeDir||0);
+  ctx.fillStyle=col; ctx.beginPath();
+  ctx.ellipse(0,0,r*(1+squash*0.4),r*(1-squash*0.3),0,0,Math.PI*2); ctx.fill();
+  ctx.rotate(-(eyeDir||0));
+  // 眼睛
+  ctx.fillStyle="#0a0e14";
+  const ex=r*0.32;
+  ctx.beginPath(); ctx.arc(-ex,-r*0.15,r*0.16,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(ex,-r*0.15,r*0.16,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+/* 巡检者 */
+function drawHunter(h){
+  ctx.save(); ctx.translate(h.x,h.y);
+  const r=CONFIG.hunter.radius;
+  ctx.fillStyle=getVar("--hunter"); ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.fill();
+  // 扫描眼(朝向)
+  ctx.rotate(h.angle);
+  ctx.fillStyle="#2a0810"; ctx.beginPath(); ctx.ellipse(r*0.4,0,r*0.42,r*0.5,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(r*0.55,0,r*0.16,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+  // 状态叹号
+  if(h.state!=="patrol"){ ctx.fillStyle=h.state==="chase"?"#ff3b52":"#e8b84b"; ctx.font="bold 22px sans-serif"; ctx.textAlign="center";
+    ctx.fillText("!", h.x, h.y-r-8); }
+}
+function drawReticle(rt){
+  ctx.strokeStyle=getVar("--accent"); ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(rt.x,rt.y,16,0,Math.PI*2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(rt.x-22,rt.y); ctx.lineTo(rt.x-8,rt.y); ctx.moveTo(rt.x+8,rt.y); ctx.lineTo(rt.x+22,rt.y);
+  ctx.moveTo(rt.x,rt.y-22); ctx.lineTo(rt.x,rt.y-8); ctx.moveTo(rt.x,rt.y+8); ctx.lineTo(rt.x,rt.y+22); ctx.stroke();
+}
+
+/* -------- 器材绘制(玩家拟态与静态器材共用，形状必须一致) -------- */
+function drawProp(g,type,x,y,s,phase,alpha){
+  const col=CONFIG.props[type].col;
+  g.save(); g.translate(x,y); g.scale(s,s); g.globalAlpha=alpha==null?1:alpha;
+  g.fillStyle=col; g.strokeStyle="rgba(0,0,0,0.25)"; g.lineWidth=1.5;
+  switch(type){
+    case 0: // 培养皿：扁圆盘+环
+      g.beginPath(); g.ellipse(0,4,20,8,0,0,Math.PI*2); g.fill(); g.stroke();
+      g.fillStyle="rgba(255,255,255,0.18)"; g.beginPath(); g.ellipse(0,1,20,8,0,0,Math.PI*2); g.fill();
+      g.strokeStyle=col; g.lineWidth=2; g.beginPath(); g.ellipse(0,1,14,5,0,0,Math.PI*2); g.stroke();
+      break;
+    case 1: // 试管：细高圆管+圆底
+      g.beginPath(); roundRectPath(g,-7,-20,14,34,7); g.fill(); g.stroke();
+      g.fillStyle="rgba(61,220,151,0.5)"; g.beginPath(); roundRectPath(g,-5,0,10,12,5); g.fill();
+      g.fillStyle="rgba(255,255,255,0.25)"; g.fillRect(-5,-18,3,28);
+      break;
+    case 2: // 烧杯：梯形+刻度+液体
+      g.beginPath(); g.moveTo(-14,-14); g.lineTo(14,-14); g.lineTo(11,16); g.lineTo(-11,16); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle="rgba(154,176,224,0.55)"; g.beginPath(); g.moveTo(-12,2); g.lineTo(12,2); g.lineTo(11,16); g.lineTo(-11,16); g.closePath(); g.fill();
+      g.strokeStyle="rgba(255,255,255,0.35)"; g.lineWidth=1; g.beginPath(); g.moveTo(6,-6); g.lineTo(11,-6); g.moveTo(6,-1); g.lineTo(11,-1); g.stroke();
+      break;
+    case 3: // 离心管：尖底锥
+      g.beginPath(); g.moveTo(-9,-14); g.lineTo(9,-14); g.lineTo(0,18); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle=col; g.beginPath(); roundRectPath(g,-10,-18,20,6,3); g.fill(); g.stroke();
+      g.fillStyle="rgba(201,160,224,0.5)"; g.beginPath(); g.moveTo(-5,0); g.lineTo(5,0); g.lineTo(0,14); g.closePath(); g.fill();
+      break;
+    case 4: // 酒精灯：矮瓶+火苗(动画)
+      g.beginPath(); roundRectPath(g,-13,-2,26,20,6); g.fill(); g.stroke();
+      g.fillStyle=col; g.beginPath(); roundRectPath(g,-6,-10,12,10,3); g.fill(); g.stroke();
+      { const fl=Math.sin(phase*8)*2; g.fillStyle="#ffb64a"; g.beginPath();
+        g.moveTo(0,-10); g.quadraticCurveTo(7+fl,-16,0,-30); g.quadraticCurveTo(-7-fl,-16,0,-10); g.fill();
+        g.fillStyle="#ffe08a"; g.beginPath();
+        g.moveTo(0,-11); g.quadraticCurveTo(3+fl,-16,0,-24); g.quadraticCurveTo(-3-fl,-16,0,-11); g.fill(); }
+      break;
+    case 5: // 菌落瓶：圆肚窄颈
+      g.beginPath(); g.arc(0,6,15,0,Math.PI*2); g.fill(); g.stroke();
+      g.beginPath(); roundRectPath(g,-5,-18,10,12,3); g.fill(); g.stroke();
+      g.fillStyle="rgba(134,214,154,0.55)"; g.beginPath(); g.arc(0,8,11,0,Math.PI*2); g.fill();
+      g.fillStyle="rgba(255,255,255,0.22)"; g.beginPath(); g.arc(-5,1,4,0,Math.PI*2); g.fill();
+      break;
+  }
+  g.restore();
+}
+function roundRectPath(g,x,y,w,h,r){ if(g.roundRect){ g.roundRect(x,y,w,h,r); return; }
+  g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
+function roundRect(g,x,y,w,h,r){ g.beginPath(); roundRectPath(g,x,y,w,h,r); }
+
+/* =========================================================================
+   HUD / 覆盖层
+   ========================================================================= */
+const $=id=>document.getElementById(id);
+function updateHUD(){
+  $("ui-mode").textContent = game? (game.mode==="A"?"躲藏":"搜寻") : "—";
+  $("ui-level").textContent = game? game.level : 1;
+  $("ui-score").textContent = game? game.score : 0;
+  $("ui-best").textContent = game? (game.mode==="A"?SAVE.bestA:SAVE.bestB) : Math.max(SAVE.bestA,SAVE.bestB);
+  const t=game? Math.ceil(game.timeLeft):0;
+  $("ui-time").textContent=t;
+  $("ui-time-wrap").classList.toggle("low", t<=10);
+  if(game && game.mode==="B") $("ui-score").textContent=game.score+" ("+game.found+"/"+game.hiderTotal+")";
+  $("alert-bar").style.width=(game&&game.mode==="A"? clamp(game.alert,0,1)*100:0)+"%";
+  tbtn.classList.toggle("showbtn", screen==="playing" && game && game.mode==="A");
+}
+function showHint(t,sec){ $("hint").innerHTML=t; hintTimer=sec||2; }
+
+const overlay=$("overlay");
+function hideOverlay(){ overlay.classList.remove("show"); }
+function showOverlay(html){ overlay.innerHTML=html; overlay.classList.add("show"); }
+
+function showMenu(){
+  screen="menu"; game=null; updateHUD(); tbtn.classList.remove("showbtn");
+  const contA = SAVE.maxLevelA>1? '<div class="cont">继续 第'+SAVE.maxLevelA+'关 ▸</div>':'';
+  const contB = SAVE.maxLevelB>1? '<div class="cont">继续 第'+SAVE.maxLevelB+'关 ▸</div>':'';
+  showOverlay(
+    '<h2 style="color:var(--accent)">Cell Mimic · 细胞拟态</h2>'+
+    '<p>选择模式开始游戏</p>'+
+    '<div class="mode-cards">'+
+      '<div class="mode-card" data-act="startA"><h3>🧫 拟态躲藏</h3><div class="em">变成器材躲避 AI 巡检者，撑过计时器过关</div>'+
+        '<div class="best">最高分 '+SAVE.bestA+'</div>'+contA+'</div>'+
+      '<div class="mode-card" data-act="startB"><h3>🔍 巡检搜寻</h3><div class="em">你当找手，从器材堆里点出伪装的细胞</div>'+
+        '<div class="best">最高分 '+SAVE.bestB+'</div>'+contB+'</div>'+
+    '</div>'+
+    '<div class="btnrow"><button class="gbtn sec" data-act="settings">设置</button></div>'+
+    '<div class="small-link" data-act="scrollDoc">查看玩法说明 / 器材图鉴</div>'
+  );
+}
+function showPause(){
+  showOverlay('<h2>已暂停</h2>'+
+    '<div class="btnrow"><button class="gbtn" data-act="resume">继续</button>'+
+    '<button class="gbtn sec" data-act="restart">重开本关</button>'+
+    '<button class="gbtn sec" data-act="menu">主菜单</button></div>');
+}
+function showSettings(back){
+  showOverlay('<h2>设置</h2>'+
+    '<div class="set-row"><label><input type="checkbox" id="set-sound" '+(SAVE.sound?"checked":"")+'> 音效</label></div>'+
+    '<div class="btnrow"><button class="gbtn sec" data-act="clear">清除记录</button>'+
+    '<button class="gbtn" data-act="'+(back||"menu")+'">返回</button></div>'+
+    '<p class="dim" id="set-msg" style="margin-top:10px"></p>');
+  $("set-sound").addEventListener("change",e=>{ SAVE.sound=e.target.checked; writeSave(); if(SAVE.sound) sfx.disguise(); });
+}
+let clearArmed=false;
+function showOverlayResult(win,score){
+  const nextLevel=game.level+1;
+  const modeName=game.mode==="A"?"拟态躲藏":"巡检搜寻";
+  let detail="";
+  if(game.mode==="A") detail= win? '你成功隐藏了整整 '+(CONFIG.roundA.baseTime+CONFIG.roundA.timePerLevel*(game.level-1))+' 秒！' : '被巡检者逮到了…';
+  else detail= win? '找齐全部 '+game.hiderTotal+' 只伪装细胞！' : '时间到，只找到 '+game.found+'/'+game.hiderTotal;
+  showOverlay(
+    '<h2 class="'+(win?"win":"lose")+'">'+(win?"过关！":"失败")+'</h2>'+
+    '<p>'+modeName+' · 第 '+game.level+' 关</p>'+
+    '<p class="big">'+detail+'</p>'+
+    '<p class="big">得分 <b style="color:var(--accent)">'+score+'</b> · 最高 '+(game.mode==="A"?SAVE.bestA:SAVE.bestB)+'</p>'+
+    '<div class="btnrow">'+
+      (win? '<button class="gbtn" data-act="next" data-lv="'+nextLevel+'">下一关 ▸</button>':'<button class="gbtn" data-act="retry">再试一次</button>')+
+      '<button class="gbtn sec" data-act="retry">重开本关</button>'+
+      '<button class="gbtn sec" data-act="menu">主菜单</button>'+
+    '</div>'
+  );
+}
+
+// 覆盖层点击派发
+overlay.addEventListener("click",e=>{
+  const el=e.target.closest("[data-act]"); if(!el) return;
+  const act=el.dataset.act;
+  actx(); // 用户手势→解锁音频
+  if(act==="startA") startGame("A", SAVE.maxLevelA>1?SAVE.maxLevelA:1);
+  else if(act==="startB") startGame("B", SAVE.maxLevelB>1?SAVE.maxLevelB:1);
+  else if(act==="settings") showSettings("menu");
+  else if(act==="menu"){ showMenu(); }
+  else if(act==="resume") resume();
+  else if(act==="restart"||act==="retry") startGame(game.mode, game.level);
+  else if(act==="next") startGame(game.mode, parseInt(el.dataset.lv,10));
+  else if(act==="clear"){ if(!clearArmed){ clearArmed=true; $("set-msg").textContent="再点一次「清除记录」确认，记录不可恢复。"; el.textContent="确认清除"; }
+    else { SAVE=freshSave(); writeSave(); clearArmed=false; showMenu(); } }
+  else if(act==="scrollDoc"){ document.querySelector(".content").scrollIntoView({behavior:"smooth"}); }
+});
+
+/* 暂停 */
+function togglePause(){ if(screen==="playing") pause(); else if(screen==="paused") resume(); }
+function pause(){ if(screen!=="playing")return; screen="paused"; showPause(); }
+function resume(){ if(screen!=="paused")return; screen="playing"; hideOverlay(); lastT=performance.now(); }
+$("btn-pause").addEventListener("click",togglePause);
+$("btn-menu").addEventListener("click",()=>{ if(screen==="playing")pause(); showMenu(); });
+
+/* =========================================================================
+   主循环 & 自适应
+   ========================================================================= */
+let lastT=performance.now();
+function loop(now){
+  let dt=(now-lastT)/1000; lastT=now;
+  if(dt>0.1) dt=0.1; // 防跳(切后台回来)
+  if(screen==="playing") update(dt);
+  if(hintTimer>0){ hintTimer-=dt; if(hintTimer<=0) $("hint").textContent=""; }
+  render();
+  requestAnimationFrame(loop);
+}
+function fitCanvas(){
+  const box=canvas.getBoundingClientRect();
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  W=Math.round(box.width*dpr); H=Math.round(box.height*dpr);
+  canvas.width=W; canvas.height=H;
+  computeView();
+}
+addEventListener("resize",fitCanvas);
+document.addEventListener("visibilitychange",()=>{ if(document.hidden && screen==="playing") pause(); });
+
+/* 图鉴渲染 */
+function buildCodex(){
+  const el=$("codex");
+  el.innerHTML=CONFIG.props.map((p,i)=>'<div class="c"><canvas width="44" height="44" data-i="'+i+'"></canvas>'+
+    '<div><div class="t">'+p.name+' <span style="color:var(--text-dim);font-size:11px">'+p.en+'</span></div>'+
+    '<div class="d">'+p.bio+'</div></div></div>').join("");
+  el.querySelectorAll("canvas").forEach(cv=>{ const g=cv.getContext("2d"); g.translate(22,24); g.scale(0.8,0.8); drawProp(g,+cv.dataset.i,0,0,1,0,1); });
+}
+
+/* 初始化 */
+function init(){
+  loadSave();
+  buildFloorCache();
+  buildCodex();
+  fitCanvas();
+  showMenu();
+  requestAnimationFrame(loop);
+}
+window.addEventListener("load", init);
+// 供调试
+window.__cm={ get game(){return game;}, get SAVE(){return SAVE;}, startGame, get screen(){return screen;} };
+</script>
+</body>
+</html>
