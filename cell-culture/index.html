@@ -6,6 +6,14 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5576402426525840"
      crossorigin="anonymous"></script>
 <title>Cell Culture — Idle Cell-Growing Browser Game | Cell Games</title>
+<link rel="canonical" href="https://rickbing.com/cell-culture/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cell Games">
+<meta property="og:title" content="Cell Culture — Idle Cell-Growing Game">
+<meta property="og:description" content="Run a petri dish where cells divide and produce biomass on their own. Buy upgrades, unlock strains, and prestige. A free idle game in your browser.">
+<meta property="og:url" content="https://rickbing.com/cell-culture/">
+<meta property="og:image" content="https://rickbing.com/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="description" content="Cell Culture is a lightweight idle game. Run a petri dish where cells from E. coli to a synthetic cell divide and produce biomass automatically. Buy upgrades, unlock strains, and prestige for permanent bonuses. It keeps earning while you are away. Mouse and touch supported.">
 <style>
 :root{
@@ -183,12 +191,10 @@ textarea.save-io{width:100%;height:90px;background:#0d131b;color:var(--text);bor
   </main>
 
   <!-- ── 广告位（结构保留，AdSense 后续插入） ── -->
-  <div class="ad-region">
+  <!-- Ad slot: hidden until AdSense approval. To go live: remove style="display:none" and paste the ad unit code inside #ad-bottom. -->
+  <div class="ad-region" style="display:none">
     <div class="ad-label">Advertisement</div>
-    <div class="ad-slot" id="ad-bottom">
-      <!-- AdSense code goes here -->
-      Ad space
-    </div>
+    <div class="ad-slot" id="ad-bottom"></div>
   </div>
 
   <!-- ── 文字内容（SEO / AdSense 审核） ── -->
@@ -213,7 +219,17 @@ textarea.save-io{width:100%;height:90px;background:#0d131b;color:var(--text);bor
 
     <section>
       <h2>Strain Field Guide</h2>
-      <div class="codex" id="codex"></div>
+      <p class="dim" style="margin-top:-4px">Every strain you unlock in the game is a real cell type. Here is what each one actually is in biology.</p>
+      <div class="codex" id="codex">
+        <div class="c"><h3>E. coli<em>Escherichia coli</em></h3><p>The classic model organism of molecular biology — it multiplies fast and is the workhorse host for genetic engineering and protein expression.</p></div>
+        <div class="c"><h3>Yeast<em>S. cerevisiae</em></h3><p>A single-celled fungus, one of the first microbes humans domesticated, and a key model for studying eukaryotic cells.</p></div>
+        <div class="c"><h3>Fibroblast<em>connective tissue</em></h3><p>The main cell of connective tissue; it secretes collagen and drives wound healing and structural support.</p></div>
+        <div class="c"><h3>Stem Cell<em>pluripotent</em></h3><p>Capable of self-renewal and of becoming many cell types — the core of regenerative medicine and tissue engineering.</p></div>
+        <div class="c"><h3>Neuron<em>nerve cell</em></h3><p>Transmits information through electrochemical signals; the basic functional unit of the nervous system.</p></div>
+        <div class="c"><h3>Cardiomyocyte<em>heart muscle</em></h3><p>A muscle cell that contracts rhythmically on its own — it is what keeps the heart beating steadily.</p></div>
+        <div class="c"><h3>Organoid<em>3D culture</em></h3><p>A miniature organ grown in 3D from stem cells, used for disease modeling, drug screening, and developmental research.</p></div>
+        <div class="c"><h3>Synthetic Cell<em>engineered</em></h3><p>A life form built from an artificially designed genome — the leading edge of synthetic biology.</p></div>
+      </div>
     </section>
 
     <section>
@@ -1058,12 +1074,8 @@ function init(){
 }
 
 // 图鉴内容
-function buildCodex(){
-  const el = $("codex");
-  el.innerHTML = CONFIG.strains.map(s=>
-    '<div class="c"><h3>'+s.name+'<em>'+s.en+'</em></h3><p>'+s.bio+'</p></div>'
-  ).join("");
-}
+// 图鉴已改为静态 HTML 直出（便于搜索引擎/爬虫读取），此处不再动态生成。
+function buildCodex(){ /* static in HTML */ }
 
 // 暴露给内联 onclick
 window.closeModal = closeModal;

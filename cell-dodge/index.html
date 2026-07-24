@@ -8,6 +8,13 @@
 <title>Cell Dodge — Bullet-Hell Browser Game | Cell Games</title>
 <meta name="description" content="Play Cell Dodge, a free bullet-hell action game. Steer a single cell through dense waves of projectiles, grab power-ups, and survive to the boss. Plays in your browser on desktop and mobile.">
 <link rel="canonical" href="https://rickbing.com/cell-dodge/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cell Games">
+<meta property="og:title" content="Cell Dodge — Bullet-Hell Browser Game">
+<meta property="og:description" content="Steer a single cell through storms of projectiles, grab power-ups, and survive to the boss. A free bullet-hell game you play in your browser.">
+<meta property="og:url" content="https://rickbing.com/cell-dodge/">
+<meta property="og:image" content="https://rickbing.com/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <style>
 :root{--bg-deep:#0a0e14;--bg-panel:#141b24;--border:#1f2b38;--text:#c8d4e0;--text-dim:#6b7d8f;--accent:#3ddc97;--accent-dim:#1a6b4a;}
 *{box-sizing:border-box;}html,body{margin:0;background:var(--bg-deep);color:var(--text);}
@@ -50,22 +57,48 @@ footer a{color:var(--text-dim);text-decoration:underline;margin:0 7px;}
   </div>
   <p class="hint">The game loads inside the frame above. If it does not start, refresh the page. Best played with sound on.</p>
 
-  <div class="ad-region">
+  <!-- Ad slot: hidden until AdSense approval. To go live: remove style="display:none" and paste the ad unit code inside #ad-dodge. -->
+  <div class="ad-region" style="display:none">
     <div class="ad-label">Advertisement</div>
-    <div class="ad-slot" id="ad-dodge"><!-- AdSense code goes here -->Ad space</div>
+    <div class="ad-slot" id="ad-dodge"></div>
   </div>
 
   <section>
     <h2>How to Play</h2>
-    <p>You control a single cell adrift in a hostile field. Enemies fill the screen with projectiles, and your only job is to <strong>survive</strong>. Weave through the gaps, grab drops to power up, and push deeper until you face the boss. Getting hit costs you — clean movement and good positioning are everything.</p>
-    <p><strong>Controls.</strong> On desktop, move with the <kbd>W A S D</kbd> or <kbd>arrow keys</kbd>. On a touch screen, drag anywhere to steer your cell. The cell follows your input continuously, so small, deliberate movements beat frantic ones.</p>
-    <p class="dim">Tip: don't chase power-ups into tight spaces. Survival first, greed second.</p>
+    <p>You control a single cell adrift in a hostile field. Enemies fill the screen with projectiles, and your only job is to <strong>survive</strong>. Weave through the gaps, collect the drops they leave behind, and push deeper wave after wave until a boss blocks the way.</p>
+    <p>The core skill in any bullet-hell game is <strong>reading patterns</strong>, not reacting to individual shots. Projectiles arrive in shapes — spreads, rings, aimed streams — and each shape leaves a safe gap somewhere. Your job is to spot that gap early and already be moving toward it. Panicked, large movements are what get you hit; players who survive longest are the ones making small, continuous adjustments.</p>
+    <p>Between stages you can strengthen your cell with upgrades. Runs are scored, and your best result is saved locally in your browser, so you always have a number to beat.</p>
+  </section>
+
+  <section>
+    <h2>Controls</h2>
+    <p>· <strong>Desktop</strong>: move with <kbd>W A S D</kbd> or the <kbd>arrow keys</kbd>.</p>
+    <p>· <strong>Touch screen</strong>: drag anywhere on the play area to steer your cell; it follows your finger continuously.</p>
+    <p class="dim">Your cell moves at a constant speed — there is no dash or brake. Everything comes down to where you point it and how early you commit.</p>
+  </section>
+
+  <section>
+    <h2>Tips &amp; Strategy</h2>
+    <p>· <strong>Stay near the middle.</strong> Hugging an edge halves the directions you can escape in. The centre gives you the most room to react.</p>
+    <p>· <strong>Move small.</strong> Micro-adjustments thread gaps that big sweeps cannot. Save large movements for repositioning between waves.</p>
+    <p>· <strong>Watch the gaps, not the bullets.</strong> Look at the empty space you are heading into rather than the projectiles you are avoiding.</p>
+    <p>· <strong>Greed kills.</strong> A pickup drifting into a dense stream is not worth the run. Survival first, collection second.</p>
+    <p>· <strong>Learn the boss.</strong> Boss attacks repeat. The first attempt is for reading the pattern; the second is for beating it.</p>
+    <p>· <strong>Best on a bigger screen.</strong> Because it is a Godot build, this one is heavier to load than the other two games — desktop or Wi-Fi gives the smoothest experience.</p>
   </section>
 
   <section>
     <h2>About the Game</h2>
-    <p>Cell Dodge is a bullet-hell (danmaku) action game and the first title in the <a href="/">Cell Games</a> collection. It is built with the Godot engine and runs entirely in your browser — no download, no sign-up. Your best runs are tracked locally on your device.</p>
-    <p class="dim">Part of a shared cell universe alongside <a href="/cell-culture/">Cell Culture</a> and <a href="/cell-mimic/">Cell Mimic</a>.</p>
+    <p>Cell Dodge is a bullet-hell (danmaku) action game and the first title in the <a href="/">Cell Games</a> collection. It is built with the <strong>Godot engine</strong> and compiled to WebAssembly, so the whole game runs inside your browser — no download, no plugin, no sign-up. Scores and progress are stored locally on your own device.</p>
+    <p>Unlike the other two games on this site, which are hand-written single HTML files, Cell Dodge is a full engine build. That buys smoother action and richer effects at the cost of a larger download, which is why it loads more slowly on a phone.</p>
+    <p class="dim">Part of a shared cell universe alongside <a href="/cell-culture/">Cell Culture</a> and <a href="/cell-mimic/">Cell Mimic</a> — the cell you steer here is the same species that later escapes the petri dish in Cell Culture.</p>
+  </section>
+
+  <section>
+    <h2>Changelog</h2>
+    <ul style="padding-left:20px">
+      <li style="color:var(--text-dim);font-size:13px"><b>v1.0.0</b> · 2026-07-17 · Initial web release: wave-based bullet-hell action, pickups, upgrades, boss encounter, and local high scores.</li>
+    </ul>
   </section>
 
   <footer>
